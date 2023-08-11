@@ -34,8 +34,5 @@ class UpscaleViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e("SR-N", "Exception: $e")
         }
-
-
-
     }
 }

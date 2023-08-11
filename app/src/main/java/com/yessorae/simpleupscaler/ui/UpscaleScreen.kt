@@ -29,14 +29,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.yessorae.simpleupscaler.common.Logger.printLog
-import java.io.IOException
-import androidx.lifecycle.viewmodel.compose.viewModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 
 @Composable
 fun UpscaleScreen(viewModel: UpscaleViewModel = viewModel()) {
@@ -59,9 +59,11 @@ fun UpscaleScreen(viewModel: UpscaleViewModel = viewModel()) {
             }
         }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState())) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
         Button(onClick = {
             val intent = Intent(
                 Intent.ACTION_GET_CONTENT,

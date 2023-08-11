@@ -32,5 +32,4 @@ class UpscaleRepository @Inject constructor(
             null
         }
     }
-
 }

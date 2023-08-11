@@ -1,6 +1,6 @@
 package com.yessorae.simpleupscaler.data.di
 
-import com.yessorae.simpleupscaler.deprecated.PicWishApiInterceptor
+import com.yessorae.simpleupscaler.data.PicWishApiInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,6 +21,7 @@ object NetworkModule {
             .addInterceptor(PicWishApiInterceptor())
             .build()
     }
+
     @Provides
     @Singleton
     fun providePicWishRetrofit(httpClient: OkHttpClient): Retrofit {

@@ -1,6 +1,5 @@
 package com.yessorae.simpleupscaler.data
 
-import com.yessorae.simpleupscaler.data.model.Data
 import com.yessorae.simpleupscaler.data.model.PicWishUpscaleResult
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
