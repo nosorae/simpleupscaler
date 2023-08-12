@@ -32,9 +32,8 @@ import com.yessorae.simpleupscaler.ui.util.BasePreview
 
 @Composable
 fun Buttons(buttons: @Composable RowScope.() -> Unit) {
-
-
 }
+
 @Composable
 fun ActionButtonWithAd(modifier: Modifier = Modifier, text: String, onClick: () -> Unit) {
     Button(

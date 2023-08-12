@@ -2,12 +2,10 @@ package com.yessorae.simpleupscaler.ui
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.text.style.TtsSpan.TimeBuilder
 import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yessorae.simpleupscaler.common.Logger.printLog
 import com.yessorae.simpleupscaler.data.repository.UpscaleRepository
 import com.yessorae.simpleupscaler.ui.model.UpscaleScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel

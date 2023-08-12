@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yessorae.simpleupscaler.R
-import com.yessorae.simpleupscaler.ui.theme.Dimen
 
 @Composable
 fun EmptyImage(modifier: Modifier = Modifier) {

@@ -3,7 +3,6 @@ package com.yessorae.simpleupscaler.ui
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -42,7 +41,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yessorae.simpleupscaler.R
-import com.yessorae.simpleupscaler.common.Logger.printLog
 import com.yessorae.simpleupscaler.ui.components.ActionButtonWithAd
 import com.yessorae.simpleupscaler.ui.components.EmptyImage
 import com.yessorae.simpleupscaler.ui.components.ImageComparer
@@ -54,15 +52,10 @@ import com.yessorae.simpleupscaler.ui.theme.Dimen
 import com.yessorae.simpleupscaler.ui.util.IntentUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,7 +96,7 @@ fun BodyScreen(
     modifier: Modifier = Modifier,
     state: UpscaleScreenState,
     onSelectImage: (before: Bitmap) -> Unit,
-    onClickUpscaleImage: (after: Bitmap, hasFace: Boolean) -> Unit,
+    onClickUpscaleImage: (after: Bitmap, hasFace: Boolean) -> Unit
 ) {
     val context = LocalContext.current
     val screenCoroutineScope = rememberCoroutineScope()
@@ -175,10 +168,9 @@ fun BodyScreen(
     }
 }
 
-
 @Composable
 fun ColumnScope.StartScreen(
-    onClick: () -> Unit,
+    onClick: () -> Unit
 ) {
     Spacer(modifier = Modifier.height(Dimen.space_16))
 
@@ -198,7 +190,7 @@ fun ColumnScope.StartScreen(
 fun ColumnScope.BeforeEnhanceScreen(
     selectedImage: Bitmap,
     onClickReselectImage: () -> Unit,
-    onClickUpscaleImage: (before: Bitmap, hasFace: Boolean) -> Unit,
+    onClickUpscaleImage: (before: Bitmap, hasFace: Boolean) -> Unit
 ) {
     var hasFace by remember {
         mutableStateOf(true)
@@ -257,7 +249,8 @@ fun ColumnScope.LoadingScreen() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .weight(1f), contentAlignment = Alignment.Center
+            .weight(1f),
+        contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()
     }
@@ -268,7 +261,7 @@ fun ColumnScope.AfterEnhanceScreen(
     before: Bitmap,
     after: Bitmap,
     onClickReselectImage: () -> Unit,
-    onClickSave: (after: Bitmap) -> Unit,
+    onClickSave: (after: Bitmap) -> Unit
 ) {
     Spacer(modifier = Modifier.height(Dimen.space_16))
 
@@ -340,7 +333,7 @@ private fun uriToBitmap(context: Context, selectedFileUri: Uri): Bitmap? {
 
 private suspend fun saveImageUrlToGallery(context: Context, bitmap: Bitmap) {
     val dateText = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    val name = "simple_upscaler_${dateText}.png"
+    val name = "simple_upscaler_$dateText.png"
     val contentValues = ContentValues().apply {
         put(MediaStore.MediaColumns.DISPLAY_NAME, name)
         put(MediaStore.MediaColumns.MIME_TYPE, "image/png")

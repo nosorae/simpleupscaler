@@ -18,5 +18,4 @@ object IntentUtil {
             putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
         }
     }
-
 }
