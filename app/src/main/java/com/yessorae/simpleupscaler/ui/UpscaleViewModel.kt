@@ -80,9 +80,9 @@ class UpscaleViewModel @Inject constructor(
 
     private fun Bitmap.toMultiPartBody(): MultipartBody.Part {
         val byteArrayOutputStream = ByteArrayOutputStream()
-        this.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        this.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
-        val requestFile = byteArray.toRequestBody("image/jpg".toMediaTypeOrNull())
-        return MultipartBody.Part.createFormData("image_file", "image.jpg", requestFile)
+        val requestFile = byteArray.toRequestBody("image/png".toMediaTypeOrNull())
+        return MultipartBody.Part.createFormData("image_file", "image.png", requestFile)
     }
 }
