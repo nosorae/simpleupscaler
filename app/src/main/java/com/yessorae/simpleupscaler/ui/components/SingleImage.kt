@@ -14,11 +14,11 @@ import com.yessorae.simpleupscaler.R
 import com.yessorae.simpleupscaler.ui.theme.Dimen
 
 @Composable
-fun SingleImage(bitmap: Bitmap) {
+fun SingleImage(modifier: Modifier = Modifier, bitmap: Bitmap) {
     Image(
         bitmap = bitmap.asImageBitmap(),
         contentDescription = stringResource(id = R.string.cd_select_image),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(Dimen.image_radius))
     )

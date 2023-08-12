@@ -1,12 +1,15 @@
 package com.yessorae.simpleupscaler.ui
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yessorae.simpleupscaler.data.repository.UpscaleRepository
+import com.yessorae.simpleupscaler.ui.model.UpscaleScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
@@ -19,6 +22,12 @@ class UpscaleViewModel @Inject constructor(
 ) : ViewModel() {
     private val _resultImageUrl = MutableStateFlow<String?>(null)
     val resultImageUrl = _resultImageUrl.asStateFlow()
+
+    private val _screenState = MutableStateFlow<UpscaleScreenState>(UpscaleScreenState.Start)
+    val screenState: StateFlow<UpscaleScreenState> = _screenState.asStateFlow()
+
+
+
     fun upscaleImage(
         imageFile: MultipartBody.Part,
         type: RequestBody,
@@ -34,5 +43,9 @@ class UpscaleViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e("SR-N", "Exception: $e")
         }
+    }
+
+    fun onSelectImage(bitmap: Bitmap) {
+        _screenState.value = UpscaleScreenState.BeforeEnhance(bitmap)
     }
 }

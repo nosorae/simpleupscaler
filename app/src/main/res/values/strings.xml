@@ -25,5 +25,5 @@
     <string name="cd_select_image">이미지 선택</string>
     <string name="cd_settings">설정</string>
     <string name="cd_help">도움말</string>
-    <string name="cd_logo">app logo</string>
+    <string name="cd_logo">앱 로고</string>
 </resources>
