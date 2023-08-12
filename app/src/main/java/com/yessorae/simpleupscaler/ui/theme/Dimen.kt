@@ -14,6 +14,6 @@ object Dimen {
     val small_icon_size = 16.dp
     val medium_icon_size = 24.dp
 
-    val image_radius = 12.dp
+    val image_radius = 4.dp
     val button_height = 64.dp
 }
