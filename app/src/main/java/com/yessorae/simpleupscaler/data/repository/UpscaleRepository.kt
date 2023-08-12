@@ -14,13 +14,15 @@ class UpscaleRepository @Inject constructor(
     suspend fun upscaleImage(
         imageFile: MultipartBody.Part,
         type: RequestBody,
-        sync: RequestBody
+        sync: RequestBody,
+        returnType: RequestBody
     ): Data? {
         val service = retrofit.create(PicWishApiService::class.java)
         val response = service.upscaleImage(
             imageFile = imageFile,
             type = type,
-            sync = sync
+            sync = sync,
+            returnType = returnType
         )
 
         return if (response.isSuccessful) {

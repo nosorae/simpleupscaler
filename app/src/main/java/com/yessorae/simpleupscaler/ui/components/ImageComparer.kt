@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -53,8 +51,8 @@ import com.yessorae.simpleupscaler.ui.theme.Dimen
 @Composable
 fun ColumnScope.ImageComparer(
     modifier: Modifier = Modifier,
-    originalImage: Bitmap,
-    enhancedImageUrl: String
+    beforeImageBitmap: Bitmap,
+    afterImageUrl: Bitmap
 ) {
     val density = LocalDensity.current
 
@@ -70,20 +68,21 @@ fun ColumnScope.ImageComparer(
 
     Box(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .weight(1f)
     ) {
-        AsyncImage(
-            model = enhancedImageUrl,
+        Image(
+            bitmap = afterImageUrl.asImageBitmap(),
             contentDescription = stringResource(id = R.string.cd_after_image),
             modifier = Modifier
                 .background(color = Color.Transparent)
                 .fillMaxSize()
-                .clip(RoundedCornerShape(Dimen.image_radius))
+                .clip(RoundedCornerShape(Dimen.image_radius)),
+            alignment = Alignment.Center
         )
 
         Image(
-            bitmap = originalImage.asImageBitmap(),
+            bitmap = beforeImageBitmap.asImageBitmap(),
             contentDescription = stringResource(id = R.string.cd_before_image),
             modifier = Modifier
                 .background(color = Color.Transparent)
@@ -111,7 +110,8 @@ fun ColumnScope.ImageComparer(
                         )
                     }
                 }
-                .clip(RoundedCornerShape(Dimen.image_radius))
+                .clip(RoundedCornerShape(Dimen.image_radius)),
+            alignment = Alignment.Center
         )
 
         Box(

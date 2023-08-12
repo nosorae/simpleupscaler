@@ -1,6 +1,7 @@
 package com.yessorae.simpleupscaler.ui
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
@@ -9,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
+import android.os.Environment
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -35,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,21 +45,31 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
 import com.yessorae.simpleupscaler.R
+import com.yessorae.simpleupscaler.common.Logger.printError
 import com.yessorae.simpleupscaler.common.Logger.printLog
 import com.yessorae.simpleupscaler.ui.components.ActionButtonWithAd
 import com.yessorae.simpleupscaler.ui.components.EmptyImage
+import com.yessorae.simpleupscaler.ui.components.ImageComparer
 import com.yessorae.simpleupscaler.ui.components.OutlinedActionButton
 import com.yessorae.simpleupscaler.ui.components.SingleImage
 import com.yessorae.simpleupscaler.ui.components.UpscaleTopAppBar
 import com.yessorae.simpleupscaler.ui.model.UpscaleScreenState
 import com.yessorae.simpleupscaler.ui.theme.Dimen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,6 +94,13 @@ fun MainScreen(viewModel: UpscaleViewModel = viewModel()) {
             state = state,
             onSelectImage = {
                 viewModel.onSelectImage(it)
+            },
+            onClickUpscaleImage = { bitmap ->
+                val imagePart = bitmap.toMultiPartBody()
+                viewModel.upscaleImage(
+                    bitmap = bitmap,
+                    imageFile = imagePart,
+                )
             }
         )
     }
@@ -90,9 +110,11 @@ fun MainScreen(viewModel: UpscaleViewModel = viewModel()) {
 fun BodyScreen(
     modifier: Modifier = Modifier,
     state: UpscaleScreenState,
-    onSelectImage: (Bitmap) -> Unit
+    onSelectImage: (Bitmap) -> Unit,
+    onClickUpscaleImage: (Bitmap) -> Unit,
 ) {
     val context = LocalContext.current
+    val screenCoroutineScope = rememberCoroutineScope()
 
     val takePhotoFromAlbumLauncher = // 갤러리에서 사진 가져오기
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -128,7 +150,7 @@ fun BodyScreen(
                         takePhotoFromAlbumLauncher.launch(createGalleryIntent())
                     },
                     onClickUpscaleImage = {
-
+                        onClickUpscaleImage(it)
                     }
                 )
             }
@@ -138,11 +160,18 @@ fun BodyScreen(
             }
 
             is UpscaleScreenState.AfterEnhance -> {
-                AfterEnhanceScreen()
-            }
-
-            is UpscaleScreenState.End -> {
-                EndScreen()
+                AfterEnhanceScreen(
+                    beforeImageBitmap = state.beforeImageBitmap,
+                    afterImageUrl = state.afterImageUrl,
+                    onClickReselectImage = {
+                        takePhotoFromAlbumLauncher.launch(createGalleryIntent())
+                    },
+                    onClickSave = { after ->
+                        screenCoroutineScope.launch(Dispatchers.IO) {
+                            saveImageUrlToGallery(context = context, bitmap = after)
+                        }
+                    }
+                )
             }
 
             is UpscaleScreenState.Error -> {
@@ -178,9 +207,11 @@ fun ColumnScope.BeforeEnhanceScreen(
     onClickReselectImage: () -> Unit,
     onClickUpscaleImage: (Bitmap) -> Unit
 ) {
-    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-        SingleImage(bitmap = selectedImage, modifier = Modifier.fillMaxWidth())
-    }
+    SingleImage(
+        bitmap = selectedImage, modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f)
+    )
     Spacer(modifier = Modifier.height(Dimen.space_16))
     Row {
         OutlinedActionButton(
@@ -199,22 +230,47 @@ fun ColumnScope.BeforeEnhanceScreen(
 
 @Composable
 fun ColumnScope.LoadingScreen() {
-
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .weight(1f), contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
 }
 
 @Composable
-fun ColumnScope.AfterEnhanceScreen() {
+fun ColumnScope.AfterEnhanceScreen(
+    beforeImageBitmap: Bitmap,
+    afterImageUrl: Bitmap,
+    onClickReselectImage: () -> Unit,
+    onClickSave: (after: Bitmap) -> Unit,
+) {
 
-}
+    ImageComparer(
+        beforeImageBitmap = beforeImageBitmap,
+        afterImageUrl = afterImageUrl
+    )
 
-@Composable
-fun ColumnScope.EndScreen() {
-
+    Spacer(modifier = Modifier.height(Dimen.space_16))
+    Row {
+        OutlinedActionButton(
+            text = stringResource(id = R.string.common_reselect_image),
+            onClick = onClickReselectImage,
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(modifier = Modifier.width(Dimen.space_8))
+        ActionButtonWithAd(
+            text = stringResource(id = R.string.common_save),
+            onClick = { onClickSave(afterImageUrl) },
+            modifier = Modifier.weight(1f)
+        )
+    }
 }
 
 @Composable
 fun ColumnScope.ErrorScreen() {
-
+    // TODO:: #2
 }
 
 @Composable
@@ -225,7 +281,7 @@ fun AdmobBanner(modifier: Modifier = Modifier) {
 @Composable
 fun UpscaleScreen(viewModel: UpscaleViewModel = viewModel()) {
     var originalImage by remember { mutableStateOf<Bitmap?>(null) }
-    val upscaledImage by viewModel.resultImageUrl.collectAsState()
+//    val upscaledImage by viewModel.resultImageUrl.collectAsState()
     var isLoading by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -233,7 +289,7 @@ fun UpscaleScreen(viewModel: UpscaleViewModel = viewModel()) {
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
-                    originalImage = uriToBitmap(context = context, selectedFileUri = uri)
+                    originalImage = uriToBitmap2(context = context, selectedFileUri = uri)
                 } ?: run {
                     printLog("uri is null")
                 }
@@ -263,19 +319,12 @@ fun UpscaleScreen(viewModel: UpscaleViewModel = viewModel()) {
         }
 
         Button(onClick = {
-            isLoading = true
             originalImage?.let { image ->
                 val imagePart = image.toMultiPartBody()
-                val type = "face".toRequestBody("text/plain".toMediaTypeOrNull())
-                val sync = "1".toRequestBody("text/plain".toMediaTypeOrNull())
                 viewModel.upscaleImage(
+                    bitmap = image,
                     imageFile = imagePart,
-                    type = type,
-                    sync = sync
                 )
-
-//                        upscaledImage = result
-//                        isLoading = false
             }
         }) {
             Text("Upscale Image")
@@ -285,13 +334,13 @@ fun UpscaleScreen(viewModel: UpscaleViewModel = viewModel()) {
             CircularProgressIndicator()
         }
 
-        upscaledImage?.let {
-            AsyncImage(
-                model = it,
-                contentDescription = null,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+//        upscaledImage?.let {
+//            AsyncImage(
+//                model = it,
+//                contentDescription = null,
+//                modifier = Modifier.fillMaxWidth()
+//            )
+//        }
     }
 }
 
@@ -314,21 +363,6 @@ fun Bitmap.toMultiPartBody(): MultipartBody.Part {
     val byteArray = byteArrayOutputStream.toByteArray()
     val requestFile = byteArray.toRequestBody("image/jpg".toMediaTypeOrNull())
     return MultipartBody.Part.createFormData("image_file", "image.jpg", requestFile)
-}
-
-fun uriToBitmap(context: Context, selectedFileUri: Uri): Bitmap? {
-    return try {
-        val parcelFileDescriptor =
-            context.contentResolver.openFileDescriptor(selectedFileUri, "r")
-        val fileDescriptor = parcelFileDescriptor?.fileDescriptor
-        val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
-        parcelFileDescriptor?.close()
-        image
-    } catch (e: IOException) {
-        // TODO record exception
-        e.printStackTrace()
-        null
-    }
 }
 
 fun uriToBitmap2(context: Context, selectedFileUri: Uri): Bitmap? {
@@ -377,5 +411,25 @@ fun createGalleryIntent(): Intent {
             arrayOf("image/jpeg", "image/png", "image/bmp", "image/webp")
         )
         putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false)
+    }
+}
+
+suspend fun saveImageUrlToGallery(context: Context, bitmap: Bitmap) {
+    val dateText = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+    val name = "simple_upscaler_${dateText}.png"
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+        put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+    }
+
+    val uri =
+        context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+    uri?.let {
+        context.contentResolver.openOutputStream(it)?.use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.flush()
+        }
     }
 }
