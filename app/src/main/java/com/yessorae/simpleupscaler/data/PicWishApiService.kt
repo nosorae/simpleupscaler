@@ -13,6 +13,7 @@ interface PicWishApiService {
     suspend fun upscaleImage(
         @Part imageFile: MultipartBody.Part,
         @Part("type") type: RequestBody,
-        @Part("sync") sync: RequestBody
+        @Part("sync") sync: RequestBody,
+        @Part("return_type") returnType: RequestBody
     ): Response<PicWishUpscaleResult>
 }

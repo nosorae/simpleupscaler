@@ -3,9 +3,10 @@ package com.yessorae.simpleupscaler.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -30,14 +31,18 @@ import com.yessorae.simpleupscaler.ui.theme.Dimen
 import com.yessorae.simpleupscaler.ui.util.BasePreview
 
 @Composable
-fun ButtonWithAd(modifier: Modifier = Modifier, text: String, onClick: () -> Unit) {
+fun Buttons(buttons: @Composable RowScope.() -> Unit) {
+}
+
+@Composable
+fun ActionButtonWithAd(modifier: Modifier = Modifier, text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = Color.White
         ),
-        modifier = modifier
+        modifier = modifier.heightIn(min = Dimen.button_height)
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
@@ -60,7 +65,7 @@ fun OutlinedActionButton(modifier: Modifier = Modifier, text: String, onClick: (
     OutlinedButton(
         onClick = onClick,
         colors = ButtonDefaults.outlinedButtonColors(),
-        modifier = modifier
+        modifier = modifier.heightIn(min = Dimen.button_height)
     ) {
         Text(
             text = text,
@@ -89,7 +94,7 @@ fun ButtonPreviews() {
                     .weight(1f)
                     .height(maxHeight)
             )
-            ButtonWithAd(
+            ActionButtonWithAd(
                 text = "화질 개선 하기",
                 onClick = {},
                 modifier = Modifier

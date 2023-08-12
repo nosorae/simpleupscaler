@@ -31,11 +31,12 @@ import com.yessorae.simpleupscaler.R
 fun EmptyImage(modifier: Modifier = Modifier) {
     val outlineColor = MaterialTheme.colorScheme.outline
     val displayWidth = LocalConfiguration.current.screenWidthDp
+    val imageRadius = 48.dp
     Box(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(imageRadius))
             .drawBehind {
                 drawRoundRect(
                     color = outlineColor,
@@ -43,7 +44,7 @@ fun EmptyImage(modifier: Modifier = Modifier) {
                         width = 24f,
                         pathEffect = PathEffect.dashPathEffect(floatArrayOf(64f, 48f), 0f)
                     ),
-                    cornerRadius = CornerRadius(12.dp.toPx())
+                    cornerRadius = CornerRadius(imageRadius.toPx())
                 )
             },
         contentAlignment = Alignment.Center
