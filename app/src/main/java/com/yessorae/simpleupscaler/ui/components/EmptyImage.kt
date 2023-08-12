@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yessorae.simpleupscaler.R
+import com.yessorae.simpleupscaler.ui.theme.Dimen
 
 @Composable
 fun EmptyImage(modifier: Modifier = Modifier) {
@@ -35,7 +36,7 @@ fun EmptyImage(modifier: Modifier = Modifier) {
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(Dimen.image_radius))
             .drawBehind {
                 drawRoundRect(
                     color = outlineColor,
@@ -43,7 +44,7 @@ fun EmptyImage(modifier: Modifier = Modifier) {
                         width = 24f,
                         pathEffect = PathEffect.dashPathEffect(floatArrayOf(64f, 48f), 0f)
                     ),
-                    cornerRadius = CornerRadius(12.dp.toPx())
+                    cornerRadius = CornerRadius(Dimen.image_radius.toPx())
                 )
             },
         contentAlignment = Alignment.Center
