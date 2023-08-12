@@ -10,6 +10,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.yessorae.simpleupscaler.R
 import com.yessorae.simpleupscaler.ui.util.BasePreview
@@ -21,17 +22,17 @@ fun UpscaleTopAppBar(onClickSettings: () -> Unit, onClickHelp: () -> Unit) {
         title = {
             Image(
                 painter = painterResource(id = R.drawable.ic_logo),
-                contentDescription = null
+                contentDescription = stringResource(id = R.string.cd_logo)
             )
         },
         actions = {
             IconButton(onClick = onClickSettings) {
-                Icon(Icons.Filled.Settings, contentDescription = null)
+                Icon(Icons.Filled.Settings, contentDescription = stringResource(id = R.string.cd_settings))
             }
             IconButton(onClick = onClickHelp) {
                 Icon(
                     imageVector = Icons.Outlined.HelpOutline,
-                    contentDescription = null
+                    contentDescription = stringResource(id = R.string.cd_help)
                 )
             }
         }

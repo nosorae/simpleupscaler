@@ -25,8 +25,10 @@ import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.yessorae.simpleupscaler.R
 
 @Composable
 fun EmptyImage(modifier: Modifier = Modifier) {
@@ -56,7 +58,7 @@ fun EmptyImage(modifier: Modifier = Modifier) {
         ) {
             Icon(
                 imageVector = Icons.Default.ImageSearch,
-                contentDescription = null,
+                contentDescription = stringResource(id = R.string.cd_select_image),
                 tint = outlineColor,
                 modifier = Modifier
                     .width(displayWidth.dp / 3)
