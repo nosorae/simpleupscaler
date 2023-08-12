@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">simpleupscaler</string>
+
+    <!-- Toast -->
+    <string name="toast_complete_enhance">이미지 화질 개선 완료</string>
+    <string name="toast_complete_save">이미지 저장 완료</string>
+
+    <!-- common -->
+    <string name="common_select_image">이미지 선택</string>
+    <string name="common_reselect_image">이미지 재선택</string>
+    <string name="common_enhance_image">화질 개선</string>
+    <string name="common_save">저장</string>
+    <string name="common_do_again">다시 하기</string>
+    <string name="common_watch_ad">광고 시청하기</string>
 </resources>
