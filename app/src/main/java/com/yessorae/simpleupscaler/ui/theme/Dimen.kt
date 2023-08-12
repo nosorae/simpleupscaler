@@ -10,4 +10,7 @@ object Dimen {
     val space_16 = 16.dp
     val space_24 = 24.dp
     val side_padding = 16.dp
+
+    val small_icon_size = 16.dp
+    val medium_icon_size = 24.dp
 }
