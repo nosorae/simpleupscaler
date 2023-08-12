@@ -40,8 +40,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.yessorae.simpleupscaler.BuildConfig
 import com.yessorae.simpleupscaler.R
 import com.yessorae.simpleupscaler.ui.components.ActionButtonWithAd
+import com.yessorae.simpleupscaler.ui.components.AdmobBanner
 import com.yessorae.simpleupscaler.ui.components.EmptyImage
 import com.yessorae.simpleupscaler.ui.components.ImageComparer
 import com.yessorae.simpleupscaler.ui.components.OutlinedActionButton
@@ -67,12 +69,12 @@ fun MainScreen(viewModel: UpscaleViewModel = viewModel()) {
         topBar = {
             UpscaleTopAppBar(
                 onClickHelp = {
-                    // TODO
+                    // TODO #5
                 }
             )
         },
         bottomBar = {
-            AdmobBanner(modifier = Modifier.fillMaxWidth())
+            BottomAdmobBanner(modifier = Modifier.fillMaxWidth())
         }
     ) { innerPadding ->
         BodyScreen(
@@ -108,10 +110,10 @@ fun BodyScreen(
                     uriToBitmap(context = context, selectedFileUri = uri)?.let { bitmap ->
                         onSelectImage(bitmap)
                     } ?: run {
-                        // TODO record exception
+                        // TODO #4 record exception
                     }
                 } ?: run {
-                    // TODO record exception
+                    // TODO #4 record exception
                 }
             }
         }
@@ -290,12 +292,12 @@ fun ColumnScope.AfterEnhanceScreen(
 
 @Composable
 fun ColumnScope.ErrorScreen() {
-    // TODO:: #2
+    // TODO:: #4
 }
 
 @Composable
-fun AdmobBanner(modifier: Modifier = Modifier) {
-    // TODO:: #3
+fun BottomAdmobBanner(modifier: Modifier = Modifier) {
+    AdmobBanner(modifier = modifier, adId = BuildConfig.ADMOB_BOTTOM_BANNER_ID)
 }
 
 private fun uriToBitmap(context: Context, selectedFileUri: Uri): Bitmap? {

@@ -4,4 +4,6 @@ plugins {
     id("org.jetbrains.kotlin.android") version "1.8.10" apply false
     id("com.google.dagger.hilt.android") version "2.44" apply false
     id("org.jlleitschuh.gradle.ktlint") version "11.5.1"
+    id("com.google.gms.google-services") version "4.3.15" apply false
+    id("com.google.firebase.crashlytics") version "2.9.8" apply false
 }

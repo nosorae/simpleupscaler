@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "709876548987",
+    "project_id": "simple-upscaler",
+    "storage_bucket": "simple-upscaler.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:709876548987:android:5cbeea514ce49fd7c8a9de",
+        "android_client_info": {
+          "package_name": "com.yessorae.simpleupscaler"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "709876548987-jue5tbp8k46siumtihgmve2tvokh6rht.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByA4FxeKFrsqWPIt1IowDLPTM2ti5Pnbw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "709876548987-jue5tbp8k46siumtihgmve2tvokh6rht.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

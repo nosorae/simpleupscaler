@@ -1,10 +1,19 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     id("org.jlleitschuh.gradle.ktlint")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
+
+val properties = Properties()
+val localPropertiesFile = rootProject.file("local.properties").inputStream()
+properties.load(localPropertiesFile)
+localPropertiesFile.close()
 
 android {
     namespace = "com.yessorae.simpleupscaler"
@@ -30,6 +39,18 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            resValue("string", "ADMOB_APP_ID", properties["ADMOB_APP_ID"].toString())
+            buildConfigField("String", "ADMOB_BOTTOM_BANNER_ID", "${properties["ADMOB_BOTTOM_BANNER_ID"]}")
+            buildConfigField("String", "ADMOB_FULL_PAGE_ID", "${properties["ADMOB_FULL_PAGE_ID"]}")
+            buildConfigField("String", "ADMOB_REWARD_ID", "${properties["ADMOB_REWARD_ID"]}")
+        }
+
+        debug {
+            resValue("string", "ADMOB_APP_ID", properties["ADMOB_APP_ID"].toString())
+            buildConfigField("String", "ADMOB_BOTTOM_BANNER_ID", "${properties["ADMOB_BOTTOM_BANNER_TEST"]}")
+            buildConfigField("String", "ADMOB_FULL_PAGE_ID", "${properties["ADMOB_FULL_PAGE_TEST"]}")
+            buildConfigField("String", "ADMOB_REWARD_ID", "${properties["ADMOB_REWARD_TEST"]}")
         }
     }
     compileOptions {
@@ -41,6 +62,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
@@ -81,6 +103,12 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.44")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+
+    implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+
+    implementation("com.google.android.gms:play-services-ads:22.2.0")
 }
 
 kapt {
