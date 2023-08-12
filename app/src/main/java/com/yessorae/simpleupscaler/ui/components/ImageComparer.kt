@@ -1,9 +1,12 @@
 package com.yessorae.simpleupscaler.ui.components
 
+
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -38,6 +41,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -54,92 +58,40 @@ import com.yessorae.simpleupscaler.R
 import com.yessorae.simpleupscaler.ui.theme.Dimen
 import com.yessorae.simpleupscaler.ui.util.BasePreview
 
-//@Composable
-//fun ImageComparer(
-//    originalImage: Painter,
-//    enhancedImage: Painter
-//) {
-//    var offset by remember { mutableStateOf(0f) }
-//
-//    Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .pointerInput(Unit) {
-//                detectHorizontalDragGestures { change, dragAmount ->
-//                    offset += dragAmount
-//                    offset = offset.coerceIn(0f, size.width.toFloat())
-//                    change.consume()
-//                }
-//            }
-//    ) {
-//        // Original Image
-//        Image(
-//            painter = originalImage,
-//            contentDescription = null,
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .graphicsLayer {
-//
-//                }
-//        )
-//
-//        // Enhanced Image
-//        Image(
-//            painter = enhancedImage,
-//            contentDescription = null,
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .graphicsLayer(
-//                    clip = true,
-//                    clipBounds = Rect(
-//                        left = offset,
-//                        top = 0f,
-//                        right = size.width.toFloat(),
-//                        bottom = size.height.toFloat()
-//                    )
-//                )
-//        )
-//
-//        // Drag Indicator
-//        Box(
-//            modifier = Modifier
-//                .width(5.dp)
-//                .fillMaxHeight()
-//                .background(Color.Gray)
-//                .offset { IntOffset(offset.toInt(), 0) }
-//        )
-//    }
-//}
-
-
 @Composable
-fun TestImage() {
+fun ColumnScope.ImageComparer(
+    modifier: Modifier = Modifier,
+    originalImage: Bitmap,
+    enhancedImageUrl: String
+) {
     val density = LocalDensity.current
+
     val screenWidth = with(density) {
         LocalConfiguration.current.screenWidthDp.dp.toPx()
     }
 
     var offset by remember { mutableStateOf(0f) }
+
     var indicatorSize by remember {
         mutableStateOf(0f)
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .height(480.dp)
+            .weight(1f)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.test_after),
-            contentDescription = null,
+        AsyncImage(
+            model = enhancedImageUrl,
+            contentDescription = stringResource(id = R.string.cd_after_image),
             modifier = Modifier
                 .background(color = Color.Transparent)
                 .fillMaxSize()
         )
 
         Image(
-            painter = painterResource(id = R.drawable.test_before),
-            contentDescription = null,
+            bitmap = originalImage.asImageBitmap(),
+            contentDescription = stringResource(id = R.string.cd_before_image),
             modifier = Modifier
                 .background(color = Color.Transparent)
                 .fillMaxSize()
@@ -176,7 +128,6 @@ fun TestImage() {
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures { change, dragAmount ->
                         offset += dragAmount
-                        offset = offset
                         change.consume()
                     }
                 }
@@ -222,19 +173,5 @@ fun TestImage() {
                 )
             }
         }
-    }
-
-//    AsyncImage(
-//        model = "https://github.com/nosorae/simpleupscaler/assets/62280009/48345196-b748-42e1-ab96-2d2653c947fd",
-//        contentDescription = null,
-//        modifier = Modifier.fillMaxWidth()
-//    )
-}
-
-@Preview(widthDp = 480)
-@Composable
-fun Preview() {
-    BasePreview {
-        TestImage()
     }
 }
