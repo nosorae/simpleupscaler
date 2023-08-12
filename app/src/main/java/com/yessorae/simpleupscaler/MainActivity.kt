@@ -8,7 +8,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.yessorae.simpleupscaler.ui.UpscaleScreen
-import com.yessorae.simpleupscaler.ui.components.TestImage
 import com.yessorae.simpleupscaler.ui.theme.SimpleupscalerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,8 +22,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-//                    UpscaleScreen()
-                    TestImage()
+                    UpscaleScreen()
                 }
             }
         }
