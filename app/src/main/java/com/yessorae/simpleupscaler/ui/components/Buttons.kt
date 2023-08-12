@@ -1,5 +1,6 @@
 package com.yessorae.simpleupscaler.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -17,9 +18,15 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -72,15 +79,32 @@ fun OutlinedActionButton(modifier: Modifier = Modifier, text: String, onClick: (
 @Preview
 @Composable
 fun ButtonPreviews() {
+    var maxHeight by remember {
+        mutableStateOf(0.dp)
+    }
+    val density = LocalDensity.current
     BasePreview(spacedBy = Dimen.space_8) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            ButtonWithAd(text = "화질 개선 하기", onClick = {}, modifier = Modifier.weight(1f))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Dimen.space_12)
+        ) {
             OutlinedActionButton(
                 text = "사진 선택 하기",
                 onClick = {},
                 modifier = Modifier
                     .weight(1f)
-                    .height(IntrinsicSize.Max)
+                    .height(maxHeight)
+            )
+            ButtonWithAd(
+                text = "화질 개선 하기",
+                onClick = {},
+                modifier = Modifier
+                    .weight(1f)
+                    .onGloballyPositioned {
+                        maxHeight = with(density) {
+                            it.size.height.toDp()
+                        }
+                    }
             )
         }
     }
