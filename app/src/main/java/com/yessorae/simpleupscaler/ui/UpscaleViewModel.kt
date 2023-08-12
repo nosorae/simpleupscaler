@@ -8,17 +8,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yessorae.simpleupscaler.data.repository.UpscaleRepository
 import com.yessorae.simpleupscaler.ui.model.UpscaleScreenState
-import com.yessorae.simpleupscaler.ui.util.MockData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
@@ -54,8 +51,8 @@ class UpscaleViewModel @Inject constructor(
             val afterBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 
             _screenState.value = UpscaleScreenState.AfterEnhance(
-                beforeImageBitmap = bitmap,
-                afterImageUrl = afterBitmap
+                before = bitmap,
+                after = afterBitmap
             )
         } catch (e: Exception) {
             // TODO record exception

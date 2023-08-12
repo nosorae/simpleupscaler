@@ -12,8 +12,8 @@ sealed class UpscaleScreenState {
     object Loading : UpscaleScreenState()
 
     data class AfterEnhance(
-        val beforeImageBitmap: Bitmap,
-        val afterImageUrl: Bitmap
+        val before: Bitmap,
+        val after: Bitmap
     ) : UpscaleScreenState()
 
     object Error : UpscaleScreenState()

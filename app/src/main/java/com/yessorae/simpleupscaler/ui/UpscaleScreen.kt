@@ -46,7 +46,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yessorae.simpleupscaler.R
-import com.yessorae.simpleupscaler.common.Logger.printError
 import com.yessorae.simpleupscaler.common.Logger.printLog
 import com.yessorae.simpleupscaler.ui.components.ActionButtonWithAd
 import com.yessorae.simpleupscaler.ui.components.EmptyImage
@@ -58,14 +57,11 @@ import com.yessorae.simpleupscaler.ui.model.UpscaleScreenState
 import com.yessorae.simpleupscaler.ui.theme.Dimen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -161,8 +157,8 @@ fun BodyScreen(
 
             is UpscaleScreenState.AfterEnhance -> {
                 AfterEnhanceScreen(
-                    beforeImageBitmap = state.beforeImageBitmap,
-                    afterImageUrl = state.afterImageUrl,
+                    before = state.before,
+                    after = state.after,
                     onClickReselectImage = {
                         takePhotoFromAlbumLauncher.launch(createGalleryIntent())
                     },
@@ -241,15 +237,15 @@ fun ColumnScope.LoadingScreen() {
 
 @Composable
 fun ColumnScope.AfterEnhanceScreen(
-    beforeImageBitmap: Bitmap,
-    afterImageUrl: Bitmap,
+    before: Bitmap,
+    after: Bitmap,
     onClickReselectImage: () -> Unit,
     onClickSave: (after: Bitmap) -> Unit,
 ) {
 
     ImageComparer(
-        beforeImageBitmap = beforeImageBitmap,
-        afterImageUrl = afterImageUrl
+        before = before,
+        after = after
     )
 
     Spacer(modifier = Modifier.height(Dimen.space_16))
@@ -262,7 +258,7 @@ fun ColumnScope.AfterEnhanceScreen(
         Spacer(modifier = Modifier.width(Dimen.space_8))
         ActionButtonWithAd(
             text = stringResource(id = R.string.common_save),
-            onClick = { onClickSave(afterImageUrl) },
+            onClick = { onClickSave(after) },
             modifier = Modifier.weight(1f)
         )
     }

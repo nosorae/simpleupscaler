@@ -44,15 +44,14 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.yessorae.simpleupscaler.R
 import com.yessorae.simpleupscaler.ui.theme.Dimen
 
 @Composable
 fun ColumnScope.ImageComparer(
     modifier: Modifier = Modifier,
-    beforeImageBitmap: Bitmap,
-    afterImageUrl: Bitmap
+    before: Bitmap,
+    after: Bitmap
 ) {
     val density = LocalDensity.current
 
@@ -72,7 +71,7 @@ fun ColumnScope.ImageComparer(
             .weight(1f)
     ) {
         Image(
-            bitmap = afterImageUrl.asImageBitmap(),
+            bitmap = after.asImageBitmap(),
             contentDescription = stringResource(id = R.string.cd_after_image),
             modifier = Modifier
                 .background(color = Color.Transparent)
@@ -82,7 +81,7 @@ fun ColumnScope.ImageComparer(
         )
 
         Image(
-            bitmap = beforeImageBitmap.asImageBitmap(),
+            bitmap = before.asImageBitmap(),
             contentDescription = stringResource(id = R.string.cd_before_image),
             modifier = Modifier
                 .background(color = Color.Transparent)
