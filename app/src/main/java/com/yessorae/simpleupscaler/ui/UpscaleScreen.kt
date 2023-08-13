@@ -10,8 +10,12 @@ import android.media.ExifInterface
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -29,19 +33,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.yessorae.simpleupscaler.BuildConfig
 import com.yessorae.simpleupscaler.R
+import com.yessorae.simpleupscaler.common.Logger.printLog
 import com.yessorae.simpleupscaler.ui.components.ActionButtonWithAd
 import com.yessorae.simpleupscaler.ui.components.AdmobBanner
 import com.yessorae.simpleupscaler.ui.components.EmptyImage
@@ -52,7 +63,11 @@ import com.yessorae.simpleupscaler.ui.components.UpscaleTopAppBar
 import com.yessorae.simpleupscaler.ui.model.UpscaleScreenState
 import com.yessorae.simpleupscaler.ui.theme.Dimen
 import com.yessorae.simpleupscaler.ui.util.IntentUtil
+import com.yessorae.simpleupscaler.ui.util.LoggedFullScreenContentCallback
+import com.yessorae.simpleupscaler.ui.util.getActivity
+import com.yessorae.simpleupscaler.ui.util.showToast
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -61,8 +76,83 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(viewModel: UpscaleViewModel = viewModel()) {
+fun MainScreen(
+    viewModel: UpscaleViewModel = viewModel()
+) {
     val state by viewModel.screenState.collectAsState()
+
+    val activity = getActivity()
+
+    var adLoading by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        launch(Dispatchers.Main) {
+            viewModel.showUpscaleRewardAdEvent.collectLatest { param ->
+                adLoading = true
+                loadUpscaleRewardAdRequest(
+                    activity,
+                    onAdLoaded = { upscaleRewardedAd ->
+                        adLoading = false
+                        upscaleRewardedAd.fullScreenContentCallback =
+                            LoggedFullScreenContentCallback(type = "UpscaleRewardAd")
+                        upscaleRewardedAd.show(activity) {
+                            printLog(message = "onUserEarnedReward")
+                            viewModel.onCompleteUpscaleRewardAdmob(param = param)
+                        }
+                    },
+                    onLoadFailed = { adError ->
+                        viewModel.onAdLoadRetryFailed(adError = adError)
+                    }
+                )
+            }
+        }
+
+        launch(Dispatchers.Main) {
+            viewModel.showSaveInterstitialAdEvent.collectLatest { param ->
+                adLoading = true
+                loadSaveInterstitialAdRequest(
+                    activity,
+                    onAdLoaded = { interstitialAd ->
+                        adLoading = false
+                        interstitialAd.fullScreenContentCallback =
+                            LoggedFullScreenContentCallback(
+                                type = "SaveInterstitialAd",
+                                onSuccessShow = {
+                                    viewModel.onCompleteShowedSaveInterstitialAdmob(param = param)
+                                },
+                                onFailedShow = { adError ->
+                                    viewModel.onErrorState(message = adError.toString())
+                                }
+                            )
+                        interstitialAd.show(activity)
+                    },
+                    onLoadFailed = { adError ->
+                        viewModel.onAdLoadRetryFailed(adError = adError)
+                        printLog("adError: $adError")
+                    }
+                )
+            }
+        }
+
+        launch {
+            viewModel.toast.collectLatest { stringModel ->
+                activity.showToast(stringModel)
+            }
+        }
+
+        launch(Dispatchers.IO) {
+            viewModel.saveImageEvent.collectLatest { saveParam ->
+                try {
+                    saveImageUrlToGallery(context = activity, bitmap = saveParam.after)
+                    viewModel.onSaveComplete()
+                } catch (e: Exception) {
+                    viewModel.onSaveFailed(e = e)
+                }
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -84,13 +174,70 @@ fun MainScreen(viewModel: UpscaleViewModel = viewModel()) {
                 viewModel.onSelectImage(before)
             },
             onClickUpscaleImage = { before, hasFace ->
-                viewModel.upscaleImage(
-                    before = before,
-                    hasFace = hasFace
+                viewModel.onClickRequestUpscale(
+                    UpscaleRequestParam(
+                        before = before,
+                        hasFace = hasFace
+                    )
+                )
+            },
+            onClickSave = { after ->
+                viewModel.onClickRequestSave(
+                    SaveRequestParam(after = after)
                 )
             }
         )
+
+        if (adLoading) {
+            AdLoadingScreen()
+        }
     }
+}
+
+private fun loadUpscaleRewardAdRequest(
+    activity: ComponentActivity,
+    onAdLoaded: (RewardedInterstitialAd) -> Unit,
+    onLoadFailed: (adError: LoadAdError) -> Unit
+) {
+    val adRequest = AdRequest.Builder().build()
+    printLog("BuildConfig ${BuildConfig.ADMOB_REWARD_FULL_PAGE_ID}")
+    RewardedInterstitialAd.load(
+        activity,
+        BuildConfig.ADMOB_REWARD_FULL_PAGE_ID,
+        adRequest,
+        object : RewardedInterstitialAdLoadCallback() {
+            override fun onAdLoaded(ad: RewardedInterstitialAd) {
+                onAdLoaded(ad)
+            }
+
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                onLoadFailed(adError)
+            }
+        }
+    )
+}
+
+private fun loadSaveInterstitialAdRequest(
+    activity: ComponentActivity,
+    onAdLoaded: (InterstitialAd) -> Unit,
+    onLoadFailed: (adError: LoadAdError) -> Unit
+) {
+    var adRequest = AdRequest.Builder().build()
+
+    InterstitialAd.load(
+        activity,
+        BuildConfig.ADMOB_FULL_PAGE_ID,
+        adRequest,
+        object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(adError: LoadAdError) {
+                onLoadFailed(adError)
+            }
+
+            override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                onAdLoaded(interstitialAd)
+            }
+        }
+    )
 }
 
 @Composable
@@ -98,10 +245,10 @@ fun BodyScreen(
     modifier: Modifier = Modifier,
     state: UpscaleScreenState,
     onSelectImage: (before: Bitmap) -> Unit,
-    onClickUpscaleImage: (after: Bitmap, hasFace: Boolean) -> Unit
+    onClickUpscaleImage: (after: Bitmap, hasFace: Boolean) -> Unit,
+    onClickSave: (after: Bitmap) -> Unit
 ) {
     val context = LocalContext.current
-    val screenCoroutineScope = rememberCoroutineScope()
 
     val takePhotoFromAlbumLauncher = // 갤러리에서 사진 가져오기
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -152,9 +299,7 @@ fun BodyScreen(
                         takePhotoFromAlbumLauncher.launch(IntentUtil.createGalleryIntent())
                     },
                     onClickSave = { after ->
-                        screenCoroutineScope.launch(Dispatchers.IO) {
-                            saveImageUrlToGallery(context = context, bitmap = after)
-                        }
+                        onClickSave(after)
                     }
                 )
             }
@@ -176,7 +321,16 @@ fun ColumnScope.StartScreen(
 ) {
     Spacer(modifier = Modifier.height(Dimen.space_16))
 
-    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .weight(1f)
+            .clickable(
+                onClick = onClick,
+                indication = null,
+                interactionSource = MutableInteractionSource()
+            ),
+        contentAlignment = Alignment.Center
+    ) {
         EmptyImage(modifier = Modifier.fillMaxWidth())
     }
     Spacer(modifier = Modifier.height(Dimen.space_16))
@@ -198,14 +352,11 @@ fun ColumnScope.BeforeEnhanceScreen(
         mutableStateOf(true)
     }
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Switch(
-            checked = hasFace,
-            onCheckedChange = {
-                hasFace = it
-            }
-        )
-        Spacer(modifier = Modifier.width(Dimen.space_4))
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text(
             text = stringResource(
                 id = if (hasFace) {
@@ -219,6 +370,15 @@ fun ColumnScope.BeforeEnhanceScreen(
                 MaterialTheme.colorScheme.primary
             } else {
                 MaterialTheme.colorScheme.outline
+            }
+        )
+
+        Spacer(modifier = Modifier.width(Dimen.space_4))
+
+        Switch(
+            checked = hasFace,
+            onCheckedChange = {
+                hasFace = it
             }
         )
     }
@@ -288,6 +448,18 @@ fun ColumnScope.AfterEnhanceScreen(
         )
     }
     Spacer(modifier = Modifier.height(Dimen.space_16))
+}
+
+@Composable
+fun AdLoadingScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(onClick = {}, enabled = false),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
 }
 
 @Composable
