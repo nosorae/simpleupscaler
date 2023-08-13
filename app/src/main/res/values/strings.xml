@@ -2,7 +2,6 @@
     <string name="app_name">simpleupscaler</string>
 
     <!-- Main -->
-    <string name="main_selected_image">선택된 이미지 👇</string>
     <string name="main_before">전</string>
     <string name="main_after">후</string>
     <string name="main_has_face">얼굴이 있어요</string>

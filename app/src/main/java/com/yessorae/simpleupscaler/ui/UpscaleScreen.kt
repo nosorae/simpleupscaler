@@ -44,9 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -100,6 +98,7 @@ fun MainScreen(
                         upscaleRewardedAd.fullScreenContentCallback =
                             LoggedFullScreenContentCallback(type = "UpscaleRewardAd")
                         upscaleRewardedAd.show(activity) {
+                            printLog(message = "onUserEarnedReward")
                             viewModel.onCompleteUpscaleRewardAdmob(param = param)
                         }
                     },
@@ -154,7 +153,6 @@ fun MainScreen(
             }
         }
     }
-
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -238,7 +236,8 @@ private fun loadSaveInterstitialAdRequest(
             override fun onAdLoaded(interstitialAd: InterstitialAd) {
                 onAdLoaded(interstitialAd)
             }
-        })
+        }
+    )
 }
 
 @Composable
@@ -247,7 +246,7 @@ fun BodyScreen(
     state: UpscaleScreenState,
     onSelectImage: (before: Bitmap) -> Unit,
     onClickUpscaleImage: (after: Bitmap, hasFace: Boolean) -> Unit,
-    onClickSave: (after: Bitmap) -> Unit,
+    onClickSave: (after: Bitmap) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -329,7 +328,8 @@ fun ColumnScope.StartScreen(
                 onClick = onClick,
                 indication = null,
                 interactionSource = MutableInteractionSource()
-            ), contentAlignment = Alignment.Center
+            ),
+        contentAlignment = Alignment.Center
     ) {
         EmptyImage(modifier = Modifier.fillMaxWidth())
     }

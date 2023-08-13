@@ -8,7 +8,7 @@ class LoggedFullScreenContentCallback(
     val type: String,
     val onSuccessShow: () -> Unit = {},
     val onFailedShow: (adError: AdError) -> Unit = {}
-): FullScreenContentCallback() {
+) : FullScreenContentCallback() {
     override fun onAdClicked() {
         super.onAdClicked()
         printLog("$type : onAdClicked")

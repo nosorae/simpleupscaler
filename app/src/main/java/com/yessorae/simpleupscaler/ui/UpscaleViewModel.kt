@@ -51,7 +51,7 @@ class UpscaleViewModel @Inject constructor(
     val toast: SharedFlow<StringModel> = _toast.asSharedFlow()
 
     private fun upscaleImage(
-        param: UpscaleRequestParam,
+        param: UpscaleRequestParam
     ) = viewModelScope.launch(Dispatchers.IO) {
         val imageFile = param.before.toMultiPartBody()
         val type = if (param.hasFace) {
@@ -67,12 +67,12 @@ class UpscaleViewModel @Inject constructor(
         try {
             _screenState.value = UpscaleScreenState.Loading
 
-//            val response = upscaleRepository.upscaleImage(
-//                imageFile = imageFile,
-//                type = type,
-//                sync = sync,
-//                returnType = returnType
-//            )
+            val response = upscaleRepository.upscaleImage(
+                imageFile = imageFile,
+                type = type,
+                sync = sync,
+                returnType = returnType
+            )
             val base64String = MockData.MOCK_IMAGE_BASE64 // response?.image
             val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
             val afterBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
@@ -81,6 +81,8 @@ class UpscaleViewModel @Inject constructor(
                 before = param.before,
                 after = afterBitmap
             )
+
+            _toast.emit(ResString(R.string.toast_complete_enhance))
         } catch (e: Exception) {
             onErrorState(message = e.toString())
         }
