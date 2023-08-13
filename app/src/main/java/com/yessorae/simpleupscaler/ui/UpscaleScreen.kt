@@ -65,6 +65,8 @@ import com.yessorae.simpleupscaler.ui.theme.Dimen
 import com.yessorae.simpleupscaler.ui.util.IntentUtil
 import com.yessorae.simpleupscaler.ui.util.LoggedFullScreenContentCallback
 import com.yessorae.simpleupscaler.ui.util.getActivity
+import com.yessorae.simpleupscaler.ui.util.getSettingsLocale
+import com.yessorae.simpleupscaler.ui.util.redirectToWebBrowser
 import com.yessorae.simpleupscaler.ui.util.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -152,6 +154,17 @@ fun MainScreen(
                 }
             }
         }
+
+        launch {
+            viewModel.redirectToWebBrowserEvent.collectLatest { link ->
+                activity.redirectToWebBrowser(
+                    link = link,
+                    onActivityNotFoundException = {
+                        viewModel.onFailRedirectToWebBrowser()
+                    }
+                )
+            }
+        }
     }
 
     Scaffold(
@@ -159,7 +172,7 @@ fun MainScreen(
         topBar = {
             UpscaleTopAppBar(
                 onClickHelp = {
-                    // TODO #5
+                    viewModel.onClickHelp(activity.getSettingsLocale())
                 }
             )
         },
