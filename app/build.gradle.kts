@@ -43,14 +43,14 @@ android {
             resValue("string", "ADMOB_APP_ID", properties["ADMOB_APP_ID"].toString())
             buildConfigField("String", "ADMOB_BOTTOM_BANNER_ID", "${properties["ADMOB_BOTTOM_BANNER_ID"]}")
             buildConfigField("String", "ADMOB_FULL_PAGE_ID", "${properties["ADMOB_FULL_PAGE_ID"]}")
-            buildConfigField("String", "ADMOB_REWARD_ID", "${properties["ADMOB_REWARD_ID"]}")
+            buildConfigField("String", "ADMOB_REWARD_FULL_PAGE_ID", "${properties["ADMOB_REWARD_FULL_PAGE_ID"]}")
         }
 
         debug {
             resValue("string", "ADMOB_APP_ID", properties["ADMOB_APP_ID"].toString())
             buildConfigField("String", "ADMOB_BOTTOM_BANNER_ID", "${properties["ADMOB_BOTTOM_BANNER_TEST"]}")
             buildConfigField("String", "ADMOB_FULL_PAGE_ID", "${properties["ADMOB_FULL_PAGE_TEST"]}")
-            buildConfigField("String", "ADMOB_REWARD_ID", "${properties["ADMOB_REWARD_TEST"]}")
+            buildConfigField("String", "ADMOB_REWARD_FULL_PAGE_ID", "${properties["ADMOB_REWARD_FULL_PAGE_TEST"]}")
         }
     }
     compileOptions {
