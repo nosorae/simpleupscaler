@@ -13,6 +13,7 @@ import com.yessorae.simpleupscaler.data.repository.UpscaleRepository
 import com.yessorae.simpleupscaler.ui.model.ResString
 import com.yessorae.simpleupscaler.ui.model.StringModel
 import com.yessorae.simpleupscaler.ui.model.UpscaleScreenState
+import com.yessorae.simpleupscaler.ui.util.HelpLink
 import com.yessorae.simpleupscaler.ui.util.MockData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,6 +48,9 @@ class UpscaleViewModel @Inject constructor(
 
     private val _saveImageEvent = MutableSharedFlow<SaveRequestParam>()
     val saveImageEvent = _saveImageEvent.asSharedFlow()
+
+    private val _redirectToWebBrowserEvent = MutableSharedFlow<String>()
+    val redirectToWebBrowserEvent = _redirectToWebBrowserEvent.asSharedFlow()
 
     protected val _toast = MutableSharedFlow<StringModel>()
     val toast: SharedFlow<StringModel> = _toast.asSharedFlow()
@@ -139,6 +144,20 @@ class UpscaleViewModel @Inject constructor(
     fun onSaveFailed(e: Exception) = viewModelScope.launch {
         onErrorState(message = e.toString())
         _toast.emit(ResString(R.string.toast_failed_save))
+    }
+
+    fun onClickHelp(languageCode: Locale) = viewModelScope.launch {
+        _redirectToWebBrowserEvent.emit(
+            if (languageCode.language.contains("ko")) {
+                HelpLink.KOREAN_HELP_LINK
+            } else {
+                HelpLink.GLOBAL_HELP_LINK
+            }
+        )
+    }
+
+    fun onFailRedirectToWebBrowser() = viewModelScope.launch {
+        _toast.emit(ResString(R.string.toast_check_web_browser_app))
     }
 
     private fun Bitmap.toMultiPartBody(): MultipartBody.Part {
