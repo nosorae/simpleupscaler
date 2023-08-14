@@ -6,7 +6,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
@@ -43,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
@@ -517,7 +517,7 @@ private fun uriToBitmap(context: Context, selectedFileUri: Uri): Bitmap? {
     }
 }
 
-private suspend fun saveImageUrlToGallery(context: Context, bitmap: Bitmap) {
+private fun saveImageUrlToGallery(context: Context, bitmap: Bitmap) {
     val dateText = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
     val name = "simple_upscaler_$dateText.png"
     val contentValues = ContentValues().apply {
