@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ampliador Simple</string>
+
+    <!-- Main -->
+    <string name="main_before">Antes</string>
+    <string name="main_after">Después</string>
+    <string name="main_has_face">Hay una Cara en la Imagen</string>
+    <string name="main_do_not_has_face">No Hay Caras en la Imagen</string>
+
+    <!-- Toast -->
+    <string name="toast_complete_enhance">Mejora de Calidad de Imagen Completada</string>
+    <string name="toast_complete_save">Imagen Guardada Exitosamente</string>
+    <string name="toast_failed_save">Falló al Guardar la Imagen, Por Favor Intente de Nuevo</string>
+    <string name="toast_check_network_error">Ocurrió un Error, Por Favor Verifique Su Conexión de Red</string>
+    <string name="toast_check_web_browser_app">Ocurrió un Error, Por Favor Verifique Si Tiene una Aplicación de Navegador Web</string>
+
+    <!-- Common -->
+    <string name="common_select_image">Seleccionar Imagen</string>
+    <string name="common_reselect_image">Volver a Seleccionar Imagen</string>
+    <string name="common_enhance_image">Mejorar Calidad</string>
+    <string name="common_save">Guardar</string>
+    <string name="common_do_again">Hacer de Nuevo</string>
+    <string name="common_watch_ad">Ver Anuncio</string>
+
+    <!-- content description -->
+    <string name="cd_selected_image">Imagen Seleccionada</string>
+    <string name="cd_before_image">Imagen Original</string>
+    <string name="cd_after_image">Imagen Mejorada</string>
+    <string name="cd_select_image">Seleccionar Imagen</string>
+    <string name="cd_settings">Configuraciones</string>
+    <string name="cd_help">Ayuda</string>
+    <string name="cd_logo">Logo de la Aplicación</string>
+</resources>

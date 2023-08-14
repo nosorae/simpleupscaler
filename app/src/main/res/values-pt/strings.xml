@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ampliador Simples</string>
+
+    <!-- Main -->
+    <string name="main_before">Antes</string>
+    <string name="main_after">Depois</string>
+    <string name="main_has_face">Há um Rosto na Imagem</string>
+    <string name="main_do_not_has_face">Não Há Rostos na Imagem</string>
+
+    <!-- Toast -->
+    <string name="toast_complete_enhance">Melhoria de Qualidade de Imagem Concluída</string>
+    <string name="toast_complete_save">Imagem Salva com Sucesso</string>
+    <string name="toast_failed_save">Falha ao Salvar a Imagem, Por Favor Tente Novamente</string>
+    <string name="toast_check_network_error">Erro Ocorrido, Por Favor Verifique Sua Conexão de Rede</string>
+    <string name="toast_check_web_browser_app">Erro Ocorrido, Por Favor Verifique se Você Tem um Aplicativo de Navegador Web</string>
+
+    <!-- Common -->
+    <string name="common_select_image">Selecionar Imagem</string>
+    <string name="common_reselect_image">Reeleger Imagem</string>
+    <string name="common_enhance_image">Melhorar Qualidade</string>
+    <string name="common_save">Salvar</string>
+    <string name="common_do_again">Fazer Novamente</string>
+    <string name="common_watch_ad">Assistir Anúncio</string>
+
+    <!-- content description -->
+    <string name="cd_selected_image">Imagem Selecionada</string>
+    <string name="cd_before_image">Imagem Original</string>
+    <string name="cd_after_image">Imagem Melhorada</string>
+    <string name="cd_select_image">Selecionar Imagem</string>
+    <string name="cd_settings">Configurações</string>
+    <string name="cd_help">Ajuda</string>
+    <string name="cd_logo">Logo do Aplicativo</string>
+</resources>

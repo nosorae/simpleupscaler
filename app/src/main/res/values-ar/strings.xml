@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مكبر الصورة البسيط</string>
+
+    <!-- Main -->
+    <string name="main_before">قبل</string>
+    <string name="main_after">بعد</string>
+    <string name="main_has_face">هناك وجه في الصورة</string>
+    <string name="main_do_not_has_face">لا توجد وجوه في الصورة</string>
+
+    <!-- Toast -->
+    <string name="toast_complete_enhance">تم تحسين جودة الصورة بنجاح</string>
+    <string name="toast_complete_save">تم حفظ الصورة بنجاح</string>
+    <string name="toast_failed_save">فشل في حفظ الصورة، يرجى المحاولة مرة أخرى</string>
+    <string name="toast_check_network_error">حدث خطأ، يرجى التحقق من اتصال الشبكة</string>
+    <string name="toast_check_web_browser_app">حدث خطأ، يرجى التحقق من وجود تطبيق متصفح ويب</string>
+
+    <!-- Common -->
+    <string name="common_select_image">اختر صورة</string>
+    <string name="common_reselect_image">أعد اختيار الصورة</string>
+    <string name="common_enhance_image">تحسين الجودة</string>
+    <string name="common_save">حفظ</string>
+    <string name="common_do_again">أعد العمل</string>
+    <string name="common_watch_ad">شاهد الإعلان</string>
+
+    <!-- content description -->
+    <string name="cd_selected_image">الصورة المختارة</string>
+    <string name="cd_before_image">الصورة الأصلية</string>
+    <string name="cd_after_image">الصورة المحسنة</string>
+    <string name="cd_select_image">اختر صورة</string>
+    <string name="cd_settings">الإعدادات</string>
+    <string name="cd_help">مساعدة</string>
+    <string name="cd_logo">شعار التطبيق</string>
+</resources>
