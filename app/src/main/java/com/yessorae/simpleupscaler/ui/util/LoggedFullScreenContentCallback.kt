@@ -15,7 +15,7 @@ class LoggedFullScreenContentCallback(
 ) : FullScreenContentCallback() {
     override fun onAdClicked() {
         super.onAdClicked()
-        Logger.event(EVENT_CLICK_AD_ARG.safeFormat(type.gaArg))
+        Logger.event(EVENT_CLICK_AD_ARG.format(type.gaArg))
     }
 
     override fun onAdDismissedFullScreenContent() {
@@ -25,7 +25,7 @@ class LoggedFullScreenContentCallback(
     override fun onAdFailedToShowFullScreenContent(p0: AdError) {
         super.onAdFailedToShowFullScreenContent(p0)
         Logger.recordAdException(p0)
-        Logger.event(EVENT_FAIL_AD_ARG.safeFormat(type.gaArg))
+        Logger.event(EVENT_FAIL_AD_ARG.format(type.gaArg))
         onFailedShow(p0)
     }
 
@@ -35,7 +35,7 @@ class LoggedFullScreenContentCallback(
 
     override fun onAdShowedFullScreenContent() {
         super.onAdShowedFullScreenContent()
-        Logger.event(EVENT_SHOW_AD_ARG.safeFormat(type.gaArg))
+        Logger.event(EVENT_SHOW_AD_ARG.format(type.gaArg))
         onSuccessShow()
     }
 }
