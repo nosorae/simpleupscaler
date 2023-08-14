@@ -52,7 +52,8 @@ import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.yessorae.simpleupscaler.BuildConfig
 import com.yessorae.simpleupscaler.R
-import com.yessorae.simpleupscaler.common.Logger.printLog
+import com.yessorae.simpleupscaler.common.Logger
+import com.yessorae.simpleupscaler.ui.components.ActionButton
 import com.yessorae.simpleupscaler.ui.components.ActionButtonWithAd
 import com.yessorae.simpleupscaler.ui.components.AdmobBanner
 import com.yessorae.simpleupscaler.ui.components.EmptyImage
@@ -60,6 +61,7 @@ import com.yessorae.simpleupscaler.ui.components.ImageComparer
 import com.yessorae.simpleupscaler.ui.components.OutlinedActionButton
 import com.yessorae.simpleupscaler.ui.components.SingleImage
 import com.yessorae.simpleupscaler.ui.components.UpscaleTopAppBar
+import com.yessorae.simpleupscaler.ui.model.FullScreenAdType
 import com.yessorae.simpleupscaler.ui.model.UpscaleScreenState
 import com.yessorae.simpleupscaler.ui.theme.Dimen
 import com.yessorae.simpleupscaler.ui.util.IntentUtil
@@ -98,9 +100,8 @@ fun MainScreen(
                     onAdLoaded = { upscaleRewardedAd ->
                         adLoading = false
                         upscaleRewardedAd.fullScreenContentCallback =
-                            LoggedFullScreenContentCallback(type = "UpscaleRewardAd")
+                            LoggedFullScreenContentCallback(type = FullScreenAdType.UPSCALE_REWARD)
                         upscaleRewardedAd.show(activity) {
-                            printLog(message = "onUserEarnedReward")
                             viewModel.onCompleteUpscaleRewardAdmob(param = param)
                         }
                     },
@@ -120,19 +121,15 @@ fun MainScreen(
                         adLoading = false
                         interstitialAd.fullScreenContentCallback =
                             LoggedFullScreenContentCallback(
-                                type = "SaveInterstitialAd",
+                                type = FullScreenAdType.SAVE_INTERSTITIAL,
                                 onSuccessShow = {
                                     viewModel.onCompleteShowedSaveInterstitialAdmob(param = param)
-                                },
-                                onFailedShow = { adError ->
-                                    viewModel.onErrorState(message = adError.toString())
                                 }
                             )
                         interstitialAd.show(activity)
                     },
                     onLoadFailed = { adError ->
                         viewModel.onAdLoadRetryFailed(adError = adError)
-                        printLog("adError: $adError")
                     }
                 )
             }
@@ -186,11 +183,12 @@ fun MainScreen(
             onSelectImage = { before ->
                 viewModel.onSelectImage(before)
             },
-            onClickUpscaleImage = { before, hasFace ->
+            onClickUpscaleImage = { before, hasFace, retry ->
                 viewModel.onClickRequestUpscale(
                     UpscaleRequestParam(
                         before = before,
-                        hasFace = hasFace
+                        hasFace = hasFace,
+                        retry = retry
                     )
                 )
             },
@@ -213,7 +211,6 @@ private fun loadUpscaleRewardAdRequest(
     onLoadFailed: (adError: LoadAdError) -> Unit
 ) {
     val adRequest = AdRequest.Builder().build()
-    printLog("BuildConfig ${BuildConfig.ADMOB_REWARD_FULL_PAGE_ID}")
     RewardedInterstitialAd.load(
         activity,
         BuildConfig.ADMOB_REWARD_FULL_PAGE_ID,
@@ -235,7 +232,7 @@ private fun loadSaveInterstitialAdRequest(
     onAdLoaded: (InterstitialAd) -> Unit,
     onLoadFailed: (adError: LoadAdError) -> Unit
 ) {
-    var adRequest = AdRequest.Builder().build()
+    val adRequest = AdRequest.Builder().build()
 
     InterstitialAd.load(
         activity,
@@ -258,7 +255,7 @@ fun BodyScreen(
     modifier: Modifier = Modifier,
     state: UpscaleScreenState,
     onSelectImage: (before: Bitmap) -> Unit,
-    onClickUpscaleImage: (after: Bitmap, hasFace: Boolean) -> Unit,
+    onClickUpscaleImage: (after: Bitmap, hasFace: Boolean, retry: Boolean) -> Unit,
     onClickSave: (after: Bitmap) -> Unit
 ) {
     val context = LocalContext.current
@@ -270,10 +267,10 @@ fun BodyScreen(
                     uriToBitmap(context = context, selectedFileUri = uri)?.let { bitmap ->
                         onSelectImage(bitmap)
                     } ?: run {
-                        // TODO #4 record exception
+                        Logger.recordCustomException("uriToBitmap is null")
                     }
                 } ?: run {
-                    // TODO #4 record exception
+                    Logger.recordCustomException("ActivityResult.data is null")
                 }
             }
         }
@@ -291,11 +288,12 @@ fun BodyScreen(
             is UpscaleScreenState.BeforeEnhance -> {
                 BeforeEnhanceScreen(
                     selectedImage = state.image,
+                    retry = state.retry,
                     onClickReselectImage = {
                         takePhotoFromAlbumLauncher.launch(IntentUtil.createGalleryIntent())
                     },
                     onClickUpscaleImage = { before, hasFace ->
-                        onClickUpscaleImage(before, hasFace)
+                        onClickUpscaleImage(before, hasFace, state.retry)
                     }
                 )
             }
@@ -317,12 +315,8 @@ fun BodyScreen(
                 )
             }
 
-            is UpscaleScreenState.Error -> {
-                ErrorScreen()
-            }
-
             else -> {
-                ErrorScreen()
+                // do nothing
             }
         }
     }
@@ -358,6 +352,7 @@ fun ColumnScope.StartScreen(
 @Composable
 fun ColumnScope.BeforeEnhanceScreen(
     selectedImage: Bitmap,
+    retry: Boolean,
     onClickReselectImage: () -> Unit,
     onClickUpscaleImage: (before: Bitmap, hasFace: Boolean) -> Unit
 ) {
@@ -410,11 +405,19 @@ fun ColumnScope.BeforeEnhanceScreen(
             modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(Dimen.space_8))
-        ActionButtonWithAd(
-            text = stringResource(id = R.string.common_enhance_image),
-            onClick = { onClickUpscaleImage(selectedImage, hasFace) },
-            modifier = Modifier.weight(1f)
-        )
+        if (retry) {
+            ActionButton(
+                text = stringResource(id = R.string.common_enhance_image),
+                onClick = { onClickUpscaleImage(selectedImage, hasFace) },
+                modifier = Modifier.weight(1f)
+            )
+        } else {
+            ActionButtonWithAd(
+                text = stringResource(id = R.string.common_enhance_image),
+                onClick = { onClickUpscaleImage(selectedImage, hasFace) },
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
     Spacer(modifier = Modifier.height(Dimen.space_16))
 }
@@ -476,11 +479,6 @@ fun AdLoadingScreen() {
 }
 
 @Composable
-fun ColumnScope.ErrorScreen() {
-    // TODO:: #4
-}
-
-@Composable
 fun BottomAdmobBanner(modifier: Modifier = Modifier) {
     AdmobBanner(modifier = modifier, adId = BuildConfig.ADMOB_BOTTOM_BANNER_ID)
 }
@@ -510,9 +508,10 @@ private fun uriToBitmap(context: Context, selectedFileUri: Uri): Bitmap? {
         image = Bitmap.createBitmap(image, 0, 0, image.width, image.height, matrix, true)
 
         parcelFileDescriptor?.close()
+        inputStream.close()
         image
     } catch (e: IOException) {
-        // TODO record exception
+        Logger.recordException(e)
         e.printStackTrace()
         null
     }

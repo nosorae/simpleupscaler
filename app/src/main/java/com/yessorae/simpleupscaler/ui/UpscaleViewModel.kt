@@ -3,12 +3,18 @@ package com.yessorae.simpleupscaler.ui
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.ads.LoadAdError
 import com.yessorae.simpleupscaler.R
+import com.yessorae.simpleupscaler.common.EVENT_CLICK_HELP
+import com.yessorae.simpleupscaler.common.EVENT_CLICK_SAVE_IMAGE
+import com.yessorae.simpleupscaler.common.EVENT_CLICK_UPSCALE_IMAGE
+import com.yessorae.simpleupscaler.common.EVENT_COMPLETE_UPSCALE_REWARD_AD
+import com.yessorae.simpleupscaler.common.EVENT_SELECT_IMAGE
 import com.yessorae.simpleupscaler.common.Logger
+import com.yessorae.simpleupscaler.common.PARAM_LANGUAGE
+import com.yessorae.simpleupscaler.common.UpscaleExceptions
 import com.yessorae.simpleupscaler.data.repository.UpscaleRepository
 import com.yessorae.simpleupscaler.ui.model.ResString
 import com.yessorae.simpleupscaler.ui.model.StringModel
@@ -58,27 +64,30 @@ class UpscaleViewModel @Inject constructor(
     private fun upscaleImage(
         param: UpscaleRequestParam
     ) = viewModelScope.launch(Dispatchers.IO) {
-        val imageFile = param.before.toMultiPartBody()
-        val type = if (param.hasFace) {
-            "face".toRequestBody("text/plain".toMediaTypeOrNull()) // face: Face Enhancement
-        } else {
-            "clean".toRequestBody("text/plain".toMediaTypeOrNull()) // clean: Whole Photo Enhancement
-        }
-
-        val sync = "1".toRequestBody("text/plain".toMediaTypeOrNull()) // 1: Synchronize
-        val returnType =
-            "2".toRequestBody("text/plain".toMediaTypeOrNull()) // 2: Return the image as a base64 string
+        if (_screenState.value is UpscaleScreenState.Loading) return@launch
 
         try {
             _screenState.value = UpscaleScreenState.Loading
 
-            val response = upscaleRepository.upscaleImage(
-                imageFile = imageFile,
-                type = type,
-                sync = sync,
-                returnType = returnType
-            )
-            val base64String = MockData.MOCK_IMAGE_BASE64 // response?.image
+            val imageFile = param.before.toMultiPartBody()
+            val type = if (param.hasFace) {
+                "face".toRequestBody("text/plain".toMediaTypeOrNull()) // face: Face Enhancement
+            } else {
+                "clean".toRequestBody("text/plain".toMediaTypeOrNull()) // clean: Whole Photo Enhancement
+            }
+
+            val sync = "1".toRequestBody("text/plain".toMediaTypeOrNull()) // 1: Synchronize
+            val returnType =
+                "2".toRequestBody("text/plain".toMediaTypeOrNull()) // 2: Return the image as a base64 string
+
+//            val response = upscaleRepository.upscaleImage(
+//                imageFile = imageFile,
+//                type = type,
+//                sync = sync,
+//                returnType = returnType
+//            )
+
+            val base64String =  MockData.MOCK_IMAGE_BASE64 // response?.image
             val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
             val afterBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 
@@ -89,7 +98,10 @@ class UpscaleViewModel @Inject constructor(
 
             _toast.emit(ResString(R.string.toast_complete_enhance))
         } catch (e: Exception) {
-            onErrorState(message = e.toString())
+            Logger.recordException(e)
+            _toast.emit(ResString(R.string.toast_check_network_error))
+            _screenState.value =
+                UpscaleScreenState.BeforeEnhance(image = param.before, retry = true)
         }
     }
 
@@ -97,25 +109,27 @@ class UpscaleViewModel @Inject constructor(
         _saveImageEvent.emit(param)
     }
 
-    fun onErrorState(message: String) {
-        // TODO record exception
-        Log.e("SR-N", "Exception: $message")
-        _screenState.value = UpscaleScreenState.Error(message)
-    }
-
     fun onSelectImage(bitmap: Bitmap) {
-        _screenState.value = UpscaleScreenState.BeforeEnhance(bitmap)
+        Logger.event(EVENT_SELECT_IMAGE)
+        _screenState.value = UpscaleScreenState.BeforeEnhance(image = bitmap, retry = false)
     }
 
     fun onClickRequestUpscale(param: UpscaleRequestParam) {
-        showUpscaleAd(param)
+        Logger.event(EVENT_CLICK_UPSCALE_IMAGE)
+        if (param.retry) {
+            upscaleImage(param = param)
+        } else {
+            showUpscaleAd(param)
+        }
     }
 
     fun onCompleteUpscaleRewardAdmob(param: UpscaleRequestParam) {
+        Logger.event(EVENT_COMPLETE_UPSCALE_REWARD_AD)
         upscaleImage(param = param)
     }
 
     fun onClickRequestSave(param: SaveRequestParam) = viewModelScope.launch {
+        Logger.event(EVENT_CLICK_SAVE_IMAGE)
         showSaveInterstitialAd(param = param)
     }
 
@@ -132,8 +146,7 @@ class UpscaleViewModel @Inject constructor(
     }
 
     fun onAdLoadRetryFailed(adError: LoadAdError) = viewModelScope.launch {
-        // TODO #4 record Exception
-        Logger.printLog("adError: $adError")
+        Logger.recordAdException(adError)
         _toast.emit(ResString(R.string.toast_check_network_error))
     }
 
@@ -142,11 +155,15 @@ class UpscaleViewModel @Inject constructor(
     }
 
     fun onSaveFailed(e: Exception) = viewModelScope.launch {
-        onErrorState(message = e.toString())
+        Logger.recordException(e)
         _toast.emit(ResString(R.string.toast_failed_save))
     }
 
     fun onClickHelp(languageCode: Locale) = viewModelScope.launch {
+        Logger.event(
+            event = EVENT_CLICK_HELP,
+            PARAM_LANGUAGE to languageCode.language
+        )
         _redirectToWebBrowserEvent.emit(
             if (languageCode.language.contains("ko")) {
                 HelpLink.KOREAN_HELP_LINK
@@ -171,7 +188,8 @@ class UpscaleViewModel @Inject constructor(
 
 data class UpscaleRequestParam(
     val before: Bitmap,
-    val hasFace: Boolean
+    val hasFace: Boolean,
+    val retry: Boolean
 )
 
 data class SaveRequestParam(

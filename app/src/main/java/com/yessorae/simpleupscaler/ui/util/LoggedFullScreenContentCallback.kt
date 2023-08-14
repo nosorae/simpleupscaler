@@ -2,37 +2,40 @@ package com.yessorae.simpleupscaler.ui.util
 
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.FullScreenContentCallback
-import com.yessorae.simpleupscaler.common.Logger.printLog
+import com.yessorae.simpleupscaler.common.EVENT_CLICK_AD_ARG
+import com.yessorae.simpleupscaler.common.EVENT_FAIL_AD_ARG
+import com.yessorae.simpleupscaler.common.EVENT_SHOW_AD_ARG
+import com.yessorae.simpleupscaler.common.Logger
+import com.yessorae.simpleupscaler.ui.model.FullScreenAdType
 
 class LoggedFullScreenContentCallback(
-    val type: String,
+    val type: FullScreenAdType,
     val onSuccessShow: () -> Unit = {},
     val onFailedShow: (adError: AdError) -> Unit = {}
 ) : FullScreenContentCallback() {
     override fun onAdClicked() {
         super.onAdClicked()
-        printLog("$type : onAdClicked")
+        Logger.event(EVENT_CLICK_AD_ARG.safeFormat(type.gaArg))
     }
 
     override fun onAdDismissedFullScreenContent() {
         super.onAdDismissedFullScreenContent()
-        printLog("$type : onAdDismissedFullScreenContent")
     }
 
     override fun onAdFailedToShowFullScreenContent(p0: AdError) {
         super.onAdFailedToShowFullScreenContent(p0)
-        printLog("$type : onAdFailedToShowFullScreenContent")
+        Logger.recordAdException(p0)
+        Logger.event(EVENT_FAIL_AD_ARG.safeFormat(type.gaArg))
         onFailedShow(p0)
     }
 
     override fun onAdImpression() {
         super.onAdImpression()
-        printLog("$type : onAdImpression")
     }
 
     override fun onAdShowedFullScreenContent() {
         super.onAdShowedFullScreenContent()
-        printLog("$type : onAdShowedFullScreenContent")
+        Logger.event(EVENT_SHOW_AD_ARG.safeFormat(type.gaArg))
         onSuccessShow()
     }
 }

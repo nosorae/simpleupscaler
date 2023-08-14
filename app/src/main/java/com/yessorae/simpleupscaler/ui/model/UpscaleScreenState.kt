@@ -6,7 +6,8 @@ sealed class UpscaleScreenState {
     object Start : UpscaleScreenState()
 
     data class BeforeEnhance(
-        val image: Bitmap
+        val image: Bitmap,
+        val retry: Boolean = false
     ) : UpscaleScreenState()
 
     object Loading : UpscaleScreenState()

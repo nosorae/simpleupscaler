@@ -21,7 +21,6 @@ fun Context.showToast(stringModel: StringModel) {
 }
 
 fun Context.redirectToWebBrowser(link: String, onActivityNotFoundException: () -> Unit) {
-    Logger.printLog("redirectToWebBrowser $link")
     Intent(Intent.ACTION_VIEW, Uri.parse(link)).also { intent ->
         try {
             startActivity(intent)
