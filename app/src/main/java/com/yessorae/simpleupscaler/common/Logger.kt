@@ -76,7 +76,7 @@ object Logger {
     ) {
         debug(
             "$event\n${
-                params.toList().joinToString(separator = "\n") { "\t${it.first} : ${it.second}" }
+            params.toList().joinToString(separator = "\n") { "\t${it.first} : ${it.second}" }
             }"
         )
     }

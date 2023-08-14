@@ -14,13 +14,11 @@ import com.yessorae.simpleupscaler.common.EVENT_COMPLETE_UPSCALE_REWARD_AD
 import com.yessorae.simpleupscaler.common.EVENT_SELECT_IMAGE
 import com.yessorae.simpleupscaler.common.Logger
 import com.yessorae.simpleupscaler.common.PARAM_LANGUAGE
-import com.yessorae.simpleupscaler.common.UpscaleExceptions
 import com.yessorae.simpleupscaler.data.repository.UpscaleRepository
 import com.yessorae.simpleupscaler.ui.model.ResString
 import com.yessorae.simpleupscaler.ui.model.StringModel
 import com.yessorae.simpleupscaler.ui.model.UpscaleScreenState
 import com.yessorae.simpleupscaler.ui.util.HelpLink
-import com.yessorae.simpleupscaler.ui.util.MockData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -58,7 +56,7 @@ class UpscaleViewModel @Inject constructor(
     private val _redirectToWebBrowserEvent = MutableSharedFlow<String>()
     val redirectToWebBrowserEvent = _redirectToWebBrowserEvent.asSharedFlow()
 
-    protected val _toast = MutableSharedFlow<StringModel>()
+    private val _toast = MutableSharedFlow<StringModel>()
     val toast: SharedFlow<StringModel> = _toast.asSharedFlow()
 
     private fun upscaleImage(
@@ -80,14 +78,14 @@ class UpscaleViewModel @Inject constructor(
             val returnType =
                 "2".toRequestBody("text/plain".toMediaTypeOrNull()) // 2: Return the image as a base64 string
 
-//            val response = upscaleRepository.upscaleImage(
-//                imageFile = imageFile,
-//                type = type,
-//                sync = sync,
-//                returnType = returnType
-//            )
+            val response = upscaleRepository.upscaleImage(
+                imageFile = imageFile,
+                type = type,
+                sync = sync,
+                returnType = returnType
+            )
 
-            val base64String =  MockData.MOCK_IMAGE_BASE64 // response?.image
+            val base64String = response?.image
             val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
             val afterBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 
