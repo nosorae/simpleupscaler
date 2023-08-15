@@ -1,6 +1,7 @@
 package com.yessorae.simpleupscaler.ui
 
 import android.app.Activity
+import android.app.DownloadManager
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
@@ -42,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.ads.AdRequest
@@ -144,7 +146,7 @@ fun MainScreen(
         launch(Dispatchers.IO) {
             viewModel.saveImageEvent.collectLatest { saveParam ->
                 try {
-                    saveImageUrlToGallery(context = activity, bitmap = saveParam.after)
+                    downloadImageByUrl(context = activity, url = saveParam.after)
                     viewModel.onSaveComplete()
                 } catch (e: Exception) {
                     viewModel.onSaveFailed(e = e)
@@ -256,7 +258,7 @@ fun BodyScreen(
     state: UpscaleScreenState,
     onSelectImage: (before: Bitmap) -> Unit,
     onClickUpscaleImage: (after: Bitmap, hasFace: Boolean, retry: Boolean) -> Unit,
-    onClickSave: (after: Bitmap) -> Unit
+    onClickSave: (after: String) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -437,9 +439,9 @@ fun ColumnScope.LoadingScreen() {
 @Composable
 fun ColumnScope.AfterEnhanceScreen(
     before: Bitmap,
-    after: Bitmap,
+    after: String,
     onClickReselectImage: () -> Unit,
-    onClickSave: (after: Bitmap) -> Unit
+    onClickSave: (after: String) -> Unit
 ) {
     Spacer(modifier = Modifier.height(Dimen.space_16))
 
@@ -535,4 +537,24 @@ private fun saveImageUrlToGallery(context: Context, bitmap: Bitmap) {
             outputStream.flush()
         }
     }
+}
+
+private fun downloadImageByUrl(context: Context, url: String) {
+    val dateText = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+    val fileName = "simple_upscaler_$dateText.png"
+
+    val request = DownloadManager.Request(Uri.parse(url))
+
+    request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
+        .setTitle(fileName)
+        .setDescription("The file is downloading...")
+        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) // 알림 설정
+        .setMimeType("image/*")
+        .setDestinationInExternalPublicDir(
+            Environment.DIRECTORY_PICTURES,
+            fileName
+        )
+
+    val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+    downloadManager.enqueue(request)
 }

@@ -14,7 +14,7 @@ sealed class UpscaleScreenState {
 
     data class AfterEnhance(
         val before: Bitmap,
-        val after: Bitmap
+        val after: String
     ) : UpscaleScreenState()
 
     data class Error(

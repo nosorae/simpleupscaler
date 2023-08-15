@@ -27,10 +27,8 @@ class UpscaleRepository @Inject constructor(
 
         return if (response.isSuccessful) {
             val jsonResponse = response.body()
-            Log.e("SR-N", "jsonResponse: $jsonResponse")
             jsonResponse?.data
         } else {
-            Log.e("SR-N", "jsonResponse: null")
             null
         }
     }

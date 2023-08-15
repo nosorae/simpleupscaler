@@ -33,7 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
+import coil.size.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
@@ -43,17 +43,22 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Precision
 import com.yessorae.simpleupscaler.R
+import com.yessorae.simpleupscaler.common.Logger
 import com.yessorae.simpleupscaler.ui.theme.Dimen
 
 @Composable
 fun ColumnScope.ImageComparer(
     modifier: Modifier = Modifier,
     before: Bitmap,
-    after: Bitmap
+    after: String
 ) {
     val density = LocalDensity.current
 
@@ -67,13 +72,22 @@ fun ColumnScope.ImageComparer(
         mutableStateOf(0f)
     }
 
+    val context = LocalContext.current
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .weight(1f)
     ) {
-        Image(
-            bitmap = after.asImageBitmap(),
+        val imageRequest = ImageRequest.Builder(context = context)
+            .size(Size.ORIGINAL)
+            .precision(Precision.EXACT)
+            .allowHardware(true)
+            .data(after)
+            .build()
+
+        AsyncImage(
+            model = after,
             contentDescription = stringResource(id = R.string.cd_after_image),
             modifier = Modifier
                 .background(color = Color.Transparent)
@@ -105,7 +119,7 @@ fun ColumnScope.ImageComparer(
                         }
                         drawRect(
                             topLeft = Offset(offset + (indicatorSize / 2), 0f),
-                            size = Size(screenWidth, size.height),
+                            size = androidx.compose.ui.geometry.Size(screenWidth, size.height),
                             color = Color.Transparent,
                             blendMode = BlendMode.Clear
                         )
