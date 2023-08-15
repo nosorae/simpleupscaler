@@ -35,6 +35,21 @@ fun Buttons(buttons: @Composable RowScope.() -> Unit) {
 }
 
 @Composable
+fun ActionButton(modifier: Modifier = Modifier, text: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(),
+        modifier = modifier.heightIn(min = Dimen.button_height)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            color = Color.White
+        )
+    }
+}
+
+@Composable
 fun ActionButtonWithAd(modifier: Modifier = Modifier, text: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
