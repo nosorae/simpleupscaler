@@ -43,7 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.compose.ui.unit.dp
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.ads.AdRequest
@@ -73,12 +73,14 @@ import com.yessorae.simpleupscaler.ui.util.getSettingsLocale
 import com.yessorae.simpleupscaler.ui.util.redirectToWebBrowser
 import com.yessorae.simpleupscaler.ui.util.showToast
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -301,7 +303,7 @@ fun BodyScreen(
             }
 
             is UpscaleScreenState.Loading -> {
-                LoadingScreen()
+                LoadingScreen(progress = state.progress)
             }
 
             is UpscaleScreenState.AfterEnhance -> {
@@ -425,14 +427,33 @@ fun ColumnScope.BeforeEnhanceScreen(
 }
 
 @Composable
-fun ColumnScope.LoadingScreen() {
+fun ColumnScope.LoadingScreen(progress: Int) {
+    var number by remember {
+        mutableStateOf(progress)
+    }
+
+    LaunchedEffect(key1 = progress) {
+        number = progress
+        while (number < 100) {
+            delay(Random.nextLong(600L, 1000L))
+            number = (number + Random.nextInt(0, 50)).coerceAtMost(100)
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .weight(1f),
+            .weight(1f)
+            .clickable(onClick = {}, enabled = false),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator()
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator()
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "$number%...",
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
     }
 }
 

@@ -10,7 +10,9 @@ sealed class UpscaleScreenState {
         val retry: Boolean = false
     ) : UpscaleScreenState()
 
-    object Loading : UpscaleScreenState()
+    data class Loading(
+        val progress: Int
+    ) : UpscaleScreenState()
 
     data class AfterEnhance(
         val before: Bitmap,

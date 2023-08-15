@@ -19,8 +19,10 @@ import com.yessorae.simpleupscaler.ui.model.ResString
 import com.yessorae.simpleupscaler.ui.model.StringModel
 import com.yessorae.simpleupscaler.ui.model.UpscaleScreenState
 import com.yessorae.simpleupscaler.ui.util.HelpLink
+import com.yessorae.simpleupscaler.ui.util.MockData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -34,6 +36,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 @HiltViewModel
 class UpscaleViewModel @Inject constructor(
@@ -65,7 +69,7 @@ class UpscaleViewModel @Inject constructor(
         if (_screenState.value is UpscaleScreenState.Loading) return@launch
 
         try {
-            _screenState.value = UpscaleScreenState.Loading
+            _screenState.value = UpscaleScreenState.Loading(progress = 0)
 
             val imageFile = param.before.toMultiPartBody()
             val type = if (param.hasFace) {
@@ -84,16 +88,20 @@ class UpscaleViewModel @Inject constructor(
             // 1: Return the download address of the image [default],
             // 2: Return the image as a base64 string
 
-            val response = upscaleRepository.upscaleImage(
-                imageFile = imageFile,
-                type = type,
-                sync = sync,
-                returnType = returnType
-            )
+            _screenState.value = UpscaleScreenState.Loading(progress = Random.nextInt(50..70))
+
+//            val response = upscaleRepository.upscaleImage(
+//                imageFile = imageFile,
+//                type = type,
+//                sync = sync,
+//                returnType = returnType
+//            ) // todo
+
+            delay(8000L) // todo
 
             _screenState.value = UpscaleScreenState.AfterEnhance(
                 before = param.before,
-                after = response!!.image
+                after = MockData.MOCK_IMAGE_URL // response!!.image // todo
             )
 
             _toast.emit(ResString(R.string.toast_complete_enhance))

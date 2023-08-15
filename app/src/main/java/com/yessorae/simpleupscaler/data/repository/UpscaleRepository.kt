@@ -1,6 +1,5 @@
 package com.yessorae.simpleupscaler.data.repository
 
-import android.util.Log
 import com.yessorae.simpleupscaler.data.PicWishApiService
 import com.yessorae.simpleupscaler.data.model.Data
 import okhttp3.MultipartBody
