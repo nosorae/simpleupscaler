@@ -18,18 +18,22 @@ object Logger {
     }
 
     fun recordException(e: Throwable) {
+        error(e.toString())
         Firebase.crashlytics.recordException(e)
     }
 
     fun recordAdException(adError: LoadAdError) {
+        error(adError.toString())
         Firebase.crashlytics.recordException(UpscaleExceptions.AdException(adError.toString()))
     }
 
     fun recordAdException(adError: AdError) {
+        error(adError.toString())
         Firebase.crashlytics.recordException(UpscaleExceptions.AdException(adError.toString()))
     }
 
     fun recordCustomException(message: String) {
+        error(message)
         Firebase.crashlytics.recordException(UpscaleExceptions.CustomException(message))
     }
 
