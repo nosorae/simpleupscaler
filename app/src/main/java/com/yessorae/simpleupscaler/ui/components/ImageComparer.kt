@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIos
-import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.ArrowLeft
 import androidx.compose.material.icons.outlined.ArrowRight
 import androidx.compose.material3.Icon
@@ -51,7 +49,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Precision
 import com.yessorae.simpleupscaler.R
-import com.yessorae.simpleupscaler.common.Logger
 import com.yessorae.simpleupscaler.ui.theme.Dimen
 
 @Composable
@@ -87,7 +84,7 @@ fun ColumnScope.ImageComparer(
             .build()
 
         AsyncImage(
-            model = after,
+            model = imageRequest,
             contentDescription = stringResource(id = R.string.cd_after_image),
             modifier = Modifier
                 .background(color = Color.Transparent)
