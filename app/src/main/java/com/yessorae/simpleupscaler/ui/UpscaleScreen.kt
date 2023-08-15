@@ -436,7 +436,7 @@ fun ColumnScope.LoadingScreen(progress: Int) {
         number = progress
         while (number < 100) {
             delay(Random.nextLong(600L, 1000L))
-            number = (number + Random.nextInt(0, 50)).coerceAtMost(100)
+            number = (number + Random.nextInt(0, 30)).coerceAtMost(100)
         }
     }
     Box(

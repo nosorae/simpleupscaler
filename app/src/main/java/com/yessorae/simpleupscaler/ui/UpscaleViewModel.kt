@@ -90,18 +90,16 @@ class UpscaleViewModel @Inject constructor(
 
             _screenState.value = UpscaleScreenState.Loading(progress = Random.nextInt(50..70))
 
-//            val response = upscaleRepository.upscaleImage(
-//                imageFile = imageFile,
-//                type = type,
-//                sync = sync,
-//                returnType = returnType
-//            ) // todo
-
-            delay(8000L) // todo
+            val response = upscaleRepository.upscaleImage(
+                imageFile = imageFile,
+                type = type,
+                sync = sync,
+                returnType = returnType
+            )
 
             _screenState.value = UpscaleScreenState.AfterEnhance(
                 before = param.before,
-                after = MockData.MOCK_IMAGE_URL // response!!.image // todo
+                after = response!!.image
             )
 
             _toast.emit(ResString(R.string.toast_complete_enhance))
