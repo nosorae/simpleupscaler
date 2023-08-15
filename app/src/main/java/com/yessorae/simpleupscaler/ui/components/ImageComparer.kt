@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIos
 import androidx.compose.material.icons.outlined.ArrowForwardIos
+import androidx.compose.material.icons.outlined.ArrowLeft
+import androidx.compose.material.icons.outlined.ArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -129,11 +131,12 @@ fun ColumnScope.ImageComparer(
                 },
             contentAlignment = Alignment.Center
         ) {
+            val lineColor = Color.White.copy(alpha = 0.8f)
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(1.dp)
-                    .background(color = MaterialTheme.colorScheme.outline)
+                    .background(color = lineColor)
             )
 
             Row(
@@ -144,25 +147,25 @@ fun ColumnScope.ImageComparer(
                 Text(
                     text = stringResource(id = R.string.main_before),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline
+                    color = lineColor
                 )
                 Icon(
-                    imageVector = Icons.Outlined.ArrowBackIos,
+                    imageVector = Icons.Outlined.ArrowLeft,
                     contentDescription = null,
                     modifier = Modifier.size(Dimen.small_icon_size),
-                    tint = MaterialTheme.colorScheme.outline
+                    tint = lineColor
                 )
                 Spacer(modifier = Modifier.width(Dimen.space_4))
                 Icon(
-                    imageVector = Icons.Outlined.ArrowForwardIos,
+                    imageVector = Icons.Outlined.ArrowRight,
                     contentDescription = null,
                     modifier = Modifier.size(Dimen.small_icon_size),
-                    tint = MaterialTheme.colorScheme.outline
+                    tint = lineColor
                 )
                 Text(
                     text = stringResource(id = R.string.main_after),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline
+                    color = lineColor
                 )
             }
         }
