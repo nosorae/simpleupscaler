@@ -34,6 +34,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 @HiltViewModel
 class UpscaleViewModel @Inject constructor(
@@ -65,18 +67,26 @@ class UpscaleViewModel @Inject constructor(
         if (_screenState.value is UpscaleScreenState.Loading) return@launch
 
         try {
-            _screenState.value = UpscaleScreenState.Loading
+            _screenState.value = UpscaleScreenState.Loading(progress = 0)
 
             val imageFile = param.before.toMultiPartBody()
             val type = if (param.hasFace) {
-                "face".toRequestBody("text/plain".toMediaTypeOrNull()) // face: Face Enhancement
+                "face".toRequestBody("text/plain".toMediaTypeOrNull())
+                // face: Face Enhancement
             } else {
-                "clean".toRequestBody("text/plain".toMediaTypeOrNull()) // clean: Whole Photo Enhancement
+                "clean".toRequestBody("text/plain".toMediaTypeOrNull())
+                // clean: Whole Photo Enhancement
             }
 
-            val sync = "1".toRequestBody("text/plain".toMediaTypeOrNull()) // 1: Synchronize
+            val sync = "1".toRequestBody("text/plain".toMediaTypeOrNull())
+            // 1: Synchronize
+
             val returnType =
-                "2".toRequestBody("text/plain".toMediaTypeOrNull()) // 2: Return the image as a base64 string
+                "1".toRequestBody("text/plain".toMediaTypeOrNull())
+            // 1: Return the download address of the image [default],
+            // 2: Return the image as a base64 string
+
+            _screenState.value = UpscaleScreenState.Loading(progress = Random.nextInt(50..70))
 
             val response = upscaleRepository.upscaleImage(
                 imageFile = imageFile,
@@ -85,13 +95,9 @@ class UpscaleViewModel @Inject constructor(
                 returnType = returnType
             )
 
-            val base64String = response?.image
-            val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
-            val afterBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
-
             _screenState.value = UpscaleScreenState.AfterEnhance(
                 before = param.before,
-                after = afterBitmap
+                after = response!!.image
             )
 
             _toast.emit(ResString(R.string.toast_complete_enhance))
@@ -182,6 +188,11 @@ class UpscaleViewModel @Inject constructor(
         val requestFile = byteArray.toRequestBody("image/png".toMediaTypeOrNull())
         return MultipartBody.Part.createFormData("image_file", "image.png", requestFile)
     }
+
+    private fun String.toBase64ToBitmap(): Bitmap {
+        val decodedBytes = Base64.decode(this, Base64.DEFAULT)
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+    }
 }
 
 data class UpscaleRequestParam(
@@ -191,5 +202,5 @@ data class UpscaleRequestParam(
 )
 
 data class SaveRequestParam(
-    val after: Bitmap
+    val after: String
 )
