@@ -19,10 +19,8 @@ import com.yessorae.simpleupscaler.ui.model.ResString
 import com.yessorae.simpleupscaler.ui.model.StringModel
 import com.yessorae.simpleupscaler.ui.model.UpscaleScreenState
 import com.yessorae.simpleupscaler.ui.util.HelpLink
-import com.yessorae.simpleupscaler.ui.util.MockData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
