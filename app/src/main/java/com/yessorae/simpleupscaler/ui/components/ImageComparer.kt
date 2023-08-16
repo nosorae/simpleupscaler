@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIos
-import androidx.compose.material.icons.outlined.ArrowForwardIos
+import androidx.compose.material.icons.outlined.ArrowLeft
+import androidx.compose.material.icons.outlined.ArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,7 +31,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
@@ -41,9 +40,14 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.size.Precision
+import coil.size.Size
 import com.yessorae.simpleupscaler.R
 import com.yessorae.simpleupscaler.ui.theme.Dimen
 
@@ -51,7 +55,7 @@ import com.yessorae.simpleupscaler.ui.theme.Dimen
 fun ColumnScope.ImageComparer(
     modifier: Modifier = Modifier,
     before: Bitmap,
-    after: Bitmap
+    after: String
 ) {
     val density = LocalDensity.current
 
@@ -65,13 +69,22 @@ fun ColumnScope.ImageComparer(
         mutableStateOf(0f)
     }
 
+    val context = LocalContext.current
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .weight(1f)
     ) {
-        Image(
-            bitmap = after.asImageBitmap(),
+        val imageRequest = ImageRequest.Builder(context = context)
+            .size(Size.ORIGINAL)
+            .precision(Precision.EXACT)
+            .allowHardware(true)
+            .data(after)
+            .build()
+
+        AsyncImage(
+            model = imageRequest,
             contentDescription = stringResource(id = R.string.cd_after_image),
             modifier = Modifier
                 .background(color = Color.Transparent)
@@ -103,7 +116,7 @@ fun ColumnScope.ImageComparer(
                         }
                         drawRect(
                             topLeft = Offset(offset + (indicatorSize / 2), 0f),
-                            size = Size(screenWidth, size.height),
+                            size = androidx.compose.ui.geometry.Size(screenWidth, size.height),
                             color = Color.Transparent,
                             blendMode = BlendMode.Clear
                         )
@@ -129,11 +142,12 @@ fun ColumnScope.ImageComparer(
                 },
             contentAlignment = Alignment.Center
         ) {
+            val lineColor = Color.White.copy(alpha = 0.8f)
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(1.dp)
-                    .background(color = MaterialTheme.colorScheme.outline)
+                    .background(color = lineColor)
             )
 
             Row(
@@ -144,25 +158,25 @@ fun ColumnScope.ImageComparer(
                 Text(
                     text = stringResource(id = R.string.main_before),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline
+                    color = lineColor
                 )
                 Icon(
-                    imageVector = Icons.Outlined.ArrowBackIos,
+                    imageVector = Icons.Outlined.ArrowLeft,
                     contentDescription = null,
                     modifier = Modifier.size(Dimen.small_icon_size),
-                    tint = MaterialTheme.colorScheme.outline
+                    tint = lineColor
                 )
                 Spacer(modifier = Modifier.width(Dimen.space_4))
                 Icon(
-                    imageVector = Icons.Outlined.ArrowForwardIos,
+                    imageVector = Icons.Outlined.ArrowRight,
                     contentDescription = null,
                     modifier = Modifier.size(Dimen.small_icon_size),
-                    tint = MaterialTheme.colorScheme.outline
+                    tint = lineColor
                 )
                 Text(
                     text = stringResource(id = R.string.main_after),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline
+                    color = lineColor
                 )
             }
         }

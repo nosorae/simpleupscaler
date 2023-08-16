@@ -1,6 +1,5 @@
 package com.yessorae.simpleupscaler.data.repository
 
-import android.util.Log
 import com.yessorae.simpleupscaler.data.PicWishApiService
 import com.yessorae.simpleupscaler.data.model.Data
 import okhttp3.MultipartBody
@@ -27,10 +26,8 @@ class UpscaleRepository @Inject constructor(
 
         return if (response.isSuccessful) {
             val jsonResponse = response.body()
-            Log.e("SR-N", "jsonResponse: $jsonResponse")
             jsonResponse?.data
         } else {
-            Log.e("SR-N", "jsonResponse: null")
             null
         }
     }
