@@ -28,14 +28,14 @@ fun UpscaleTopAppBar(
                 contentDescription = stringResource(id = R.string.cd_logo)
             )
         },
-        actions = {
-            IconButton(onClick = onClickHelp) {
-                Icon(
-                    imageVector = Icons.Outlined.HelpOutline,
-                    contentDescription = stringResource(id = R.string.cd_help)
-                )
-            }
-        }
+//        actions = {
+//            IconButton(onClick = onClickHelp) {
+//                Icon(
+//                    imageVector = Icons.Outlined.HelpOutline,
+//                    contentDescription = stringResource(id = R.string.cd_help)
+//                )
+//            }
+//        }
     )
 }
 

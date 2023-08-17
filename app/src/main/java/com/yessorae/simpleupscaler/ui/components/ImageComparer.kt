@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -73,7 +75,7 @@ fun ColumnScope.ImageComparer(
 
     Box(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .weight(1f)
     ) {
         val imageRequest = ImageRequest.Builder(context = context)
@@ -90,7 +92,8 @@ fun ColumnScope.ImageComparer(
                 .background(color = Color.Transparent)
                 .fillMaxSize()
                 .clip(RoundedCornerShape(Dimen.image_radius)),
-            alignment = Alignment.Center
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Crop
         )
 
         Image(
@@ -123,7 +126,8 @@ fun ColumnScope.ImageComparer(
                     }
                 }
                 .clip(RoundedCornerShape(Dimen.image_radius)),
-            alignment = Alignment.Center
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Crop
         )
 
         Box(
@@ -155,11 +159,11 @@ fun ColumnScope.ImageComparer(
                     .align(Alignment.Center),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = stringResource(id = R.string.main_before),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = lineColor
-                )
+//                Text(
+//                    text = stringResource(id = R.string.main_before),
+//                    style = MaterialTheme.typography.labelSmall,
+//                    color = lineColor
+//                )
                 Icon(
                     imageVector = Icons.Outlined.ArrowLeft,
                     contentDescription = null,
@@ -173,11 +177,11 @@ fun ColumnScope.ImageComparer(
                     modifier = Modifier.size(Dimen.small_icon_size),
                     tint = lineColor
                 )
-                Text(
-                    text = stringResource(id = R.string.main_after),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = lineColor
-                )
+//                Text(
+//                    text = stringResource(id = R.string.main_after),
+//                    style = MaterialTheme.typography.labelSmall,
+//                    color = lineColor
+//                )
             }
         }
     }

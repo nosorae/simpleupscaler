@@ -24,11 +24,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.SaveAlt
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -41,8 +49,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -178,7 +188,7 @@ fun MainScreen(
             )
         },
         bottomBar = {
-            BottomAdmobBanner(modifier = Modifier.fillMaxWidth())
+//            BottomAdmobBanner(modifier = Modifier.fillMaxWidth())
         }
     ) { innerPadding ->
         BodyScreen(
@@ -188,13 +198,20 @@ fun MainScreen(
                 viewModel.onSelectImage(before)
             },
             onClickUpscaleImage = { before, hasFace, retry ->
-                viewModel.onClickRequestUpscale(
-                    UpscaleRequestParam(
+                viewModel.onCompleteUpscaleRewardAdmob(
+                    param = UpscaleRequestParam(
                         before = before,
                         hasFace = hasFace,
                         retry = retry
                     )
                 )
+//                viewModel.onClickRequestUpscale(
+//                    UpscaleRequestParam(
+//                        before = before,
+//                        hasFace = hasFace,
+//                        retry = retry
+//                    )
+//                )
             },
             onClickSave = { after ->
                 viewModel.onClickRequestSave(
@@ -279,7 +296,7 @@ fun BodyScreen(
             }
         }
 
-    Column(modifier = modifier.padding(horizontal = Dimen.space_16)) {
+    Column(modifier = modifier) {
         when (state) {
             is UpscaleScreenState.Start -> {
                 StartScreen(
@@ -473,18 +490,30 @@ fun ColumnScope.AfterEnhanceScreen(
 
     Spacer(modifier = Modifier.height(Dimen.space_16))
 
-    Row {
-        OutlinedActionButton(
-            text = stringResource(id = R.string.common_reselect_image),
+    Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+        OutlinedButton(
             onClick = onClickReselectImage,
-            modifier = Modifier.weight(1f)
-        )
+            colors = ButtonDefaults.outlinedButtonColors(),
+            modifier = Modifier
+                .weight(1f)
+                .heightIn(min = Dimen.button_height)
+        ) {
+            Icon(imageVector = Icons.Outlined.Refresh, contentDescription = null)
+        }
+
         Spacer(modifier = Modifier.width(Dimen.space_8))
-        ActionButtonWithAd(
-            text = stringResource(id = R.string.common_save),
+        Button(
             onClick = { onClickSave(after) },
-            modifier = Modifier.weight(1f)
-        )
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White
+            ),
+            modifier = Modifier
+                .weight(1f)
+                .heightIn(min = Dimen.button_height)
+        ) {
+            Icon(imageVector = Icons.Outlined.SaveAlt, contentDescription = null)
+        }
     }
     Spacer(modifier = Modifier.height(Dimen.space_16))
 }
