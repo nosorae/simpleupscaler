@@ -23,8 +23,8 @@ android {
         applicationId = "com.yessorae.simpleupscaler"
         minSdk = 24
         targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 1_00_00_01
+        versionName = "1.0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
