@@ -23,10 +23,7 @@ fun UpscaleTopAppBar(
     TopAppBar(
         modifier = modifier,
         title = {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_logo),
-                contentDescription = stringResource(id = R.string.cd_logo)
-            )
+            // do nothing
         },
         actions = {
             IconButton(onClick = onClickHelp) {

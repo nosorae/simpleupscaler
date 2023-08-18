@@ -18,8 +18,4 @@ sealed class UpscaleScreenState {
         val before: Bitmap,
         val after: String
     ) : UpscaleScreenState()
-
-    data class Error(
-        val message: String
-    ) : UpscaleScreenState()
 }

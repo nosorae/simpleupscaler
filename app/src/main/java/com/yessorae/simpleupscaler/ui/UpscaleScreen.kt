@@ -171,11 +171,13 @@ fun MainScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            UpscaleTopAppBar(
-                onClickHelp = {
-                    viewModel.onClickHelp(activity.getSettingsLocale())
-                }
-            )
+            if (state is UpscaleScreenState.Start) {
+                UpscaleTopAppBar(
+                    onClickHelp = {
+                        viewModel.onClickHelp(activity.getSettingsLocale())
+                    }
+                )
+            }
         },
         bottomBar = {
             BottomAdmobBanner(modifier = Modifier.fillMaxWidth())
@@ -264,7 +266,7 @@ fun BodyScreen(
 ) {
     val context = LocalContext.current
 
-    val takePhotoFromAlbumLauncher = // 갤러리에서 사진 가져오기
+    val takePhotoFromAlbumLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
@@ -279,7 +281,7 @@ fun BodyScreen(
             }
         }
 
-    Column(modifier = modifier.padding(horizontal = Dimen.space_16)) {
+    Column(modifier = modifier) {
         when (state) {
             is UpscaleScreenState.Start -> {
                 StartScreen(
@@ -318,10 +320,6 @@ fun BodyScreen(
                     }
                 )
             }
-
-            else -> {
-                // do nothing
-            }
         }
     }
 }
@@ -334,6 +332,7 @@ fun ColumnScope.StartScreen(
 
     Box(
         modifier = Modifier
+            .padding(horizontal = Dimen.space_16)
             .weight(1f)
             .clickable(
                 onClick = onClick,
@@ -348,7 +347,9 @@ fun ColumnScope.StartScreen(
     OutlinedActionButton(
         text = stringResource(id = R.string.common_select_image),
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Dimen.space_16)
     )
     Spacer(modifier = Modifier.height(Dimen.space_16))
 }
@@ -367,7 +368,9 @@ fun ColumnScope.BeforeEnhanceScreen(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = Dimen.space_16)
     ) {
         Text(
             text = stringResource(
@@ -402,7 +405,7 @@ fun ColumnScope.BeforeEnhanceScreen(
             .weight(1f)
     )
     Spacer(modifier = Modifier.height(Dimen.space_16))
-    Row {
+    Row(modifier = Modifier.padding(horizontal = Dimen.space_16)) {
         OutlinedActionButton(
             text = stringResource(id = R.string.common_reselect_image),
             onClick = onClickReselectImage,
@@ -473,7 +476,7 @@ fun ColumnScope.AfterEnhanceScreen(
 
     Spacer(modifier = Modifier.height(Dimen.space_16))
 
-    Row {
+    Row(modifier = Modifier.padding(horizontal = Dimen.space_16)) {
         OutlinedActionButton(
             text = stringResource(id = R.string.common_reselect_image),
             onClick = onClickReselectImage,
