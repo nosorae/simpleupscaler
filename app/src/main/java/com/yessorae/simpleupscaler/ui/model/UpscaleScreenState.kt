@@ -19,6 +19,11 @@ sealed class UpscaleScreenState {
         val after: String
     ) : UpscaleScreenState()
 
+    data class MockAfterEnhance(
+        val before: Bitmap? = null,
+        val after: Bitmap? = null
+    ) : UpscaleScreenState()
+
     data class Error(
         val message: String
     ) : UpscaleScreenState()

@@ -41,7 +41,7 @@ import kotlin.random.nextInt
 class UpscaleViewModel @Inject constructor(
     private val upscaleRepository: UpscaleRepository
 ) : ViewModel() {
-    private val _screenState = MutableStateFlow<UpscaleScreenState>(UpscaleScreenState.Start)
+    private val _screenState = MutableStateFlow<UpscaleScreenState>(UpscaleScreenState.MockAfterEnhance())
     val screenState: StateFlow<UpscaleScreenState> = _screenState.asStateFlow()
 
     private val _showUpscaleRewardAdEvent = MutableSharedFlow<UpscaleRequestParam>()
@@ -115,7 +115,21 @@ class UpscaleViewModel @Inject constructor(
 
     fun onSelectImage(bitmap: Bitmap) {
         Logger.event(EVENT_SELECT_IMAGE)
-        _screenState.value = UpscaleScreenState.BeforeEnhance(image = bitmap, retry = false)
+        (screenState.value as? UpscaleScreenState.MockAfterEnhance)?.let {
+            _screenState.value = it.copy(before = bitmap)
+
+        } ?: run {
+            _screenState.value = UpscaleScreenState.MockAfterEnhance(before = bitmap)
+        }
+    }
+
+    fun onSelectAfterImage(bitmap: Bitmap) {
+        (screenState.value as? UpscaleScreenState.MockAfterEnhance)?.let {
+            _screenState.value = it.copy(after = bitmap)
+        } ?: run {
+            _screenState.value = UpscaleScreenState.MockAfterEnhance(after = bitmap)
+
+        }
     }
 
     fun onClickRequestUpscale(param: UpscaleRequestParam) {

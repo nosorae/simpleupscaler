@@ -52,7 +52,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -70,6 +69,7 @@ import com.yessorae.simpleupscaler.ui.components.ActionButtonWithAd
 import com.yessorae.simpleupscaler.ui.components.AdmobBanner
 import com.yessorae.simpleupscaler.ui.components.EmptyImage
 import com.yessorae.simpleupscaler.ui.components.ImageComparer
+import com.yessorae.simpleupscaler.ui.components.MockImageComparer
 import com.yessorae.simpleupscaler.ui.components.OutlinedActionButton
 import com.yessorae.simpleupscaler.ui.components.SingleImage
 import com.yessorae.simpleupscaler.ui.components.UpscaleTopAppBar
@@ -197,6 +197,9 @@ fun MainScreen(
             onSelectImage = { before ->
                 viewModel.onSelectImage(before)
             },
+            onSelectAfterImage = { after ->
+                viewModel.onSelectAfterImage(after)
+            },
             onClickUpscaleImage = { before, hasFace, retry ->
                 viewModel.onCompleteUpscaleRewardAdmob(
                     param = UpscaleRequestParam(
@@ -276,6 +279,7 @@ fun BodyScreen(
     modifier: Modifier = Modifier,
     state: UpscaleScreenState,
     onSelectImage: (before: Bitmap) -> Unit,
+    onSelectAfterImage: (before: Bitmap) -> Unit,
     onClickUpscaleImage: (after: Bitmap, hasFace: Boolean, retry: Boolean) -> Unit,
     onClickSave: (after: String) -> Unit
 ) {
@@ -287,6 +291,21 @@ fun BodyScreen(
                 result.data?.data?.let { uri ->
                     uriToBitmap(context = context, selectedFileUri = uri)?.let { bitmap ->
                         onSelectImage(bitmap)
+                    } ?: run {
+                        Logger.recordCustomException("uriToBitmap is null")
+                    }
+                } ?: run {
+                    Logger.recordCustomException("ActivityResult.data is null")
+                }
+            }
+        }
+
+    val takeAfterPhotoFromAlbumLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let { uri ->
+                    uriToBitmap(context = context, selectedFileUri = uri)?.let { bitmap ->
+                        onSelectAfterImage(bitmap)
                     } ?: run {
                         Logger.recordCustomException("uriToBitmap is null")
                     }
@@ -332,6 +351,19 @@ fun BodyScreen(
                     },
                     onClickSave = { after ->
                         onClickSave(after)
+                    }
+                )
+            }
+
+            is UpscaleScreenState.MockAfterEnhance -> {
+                MockAfterEnhanceScreen(
+                    before = state.before,
+                    after = state.after,
+                    onClickSelectBefore = {
+                        takePhotoFromAlbumLauncher.launch(IntentUtil.createGalleryIntent())
+                    },
+                    onClickSelectAfter = {
+                        takeAfterPhotoFromAlbumLauncher.launch(IntentUtil.createGalleryIntent())
                     }
                 )
             }
@@ -517,6 +549,51 @@ fun ColumnScope.AfterEnhanceScreen(
     }
     Spacer(modifier = Modifier.height(Dimen.space_16))
 }
+
+@Composable
+fun ColumnScope.MockAfterEnhanceScreen(
+    before: Bitmap?,
+    after: Bitmap?,
+    onClickSelectBefore: () -> Unit,
+    onClickSelectAfter: () -> Unit
+) {
+    Spacer(modifier = Modifier.height(Dimen.space_16))
+
+    MockImageComparer(
+        before = before,
+        after = after
+    )
+
+    Spacer(modifier = Modifier.height(Dimen.space_16))
+
+    Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+        OutlinedButton(
+            onClick = onClickSelectBefore,
+            colors = ButtonDefaults.outlinedButtonColors(),
+            modifier = Modifier
+                .weight(1f)
+                .heightIn(min = Dimen.button_height)
+        ) {
+            Icon(imageVector = Icons.Outlined.Refresh, contentDescription = null)
+        }
+
+        Spacer(modifier = Modifier.width(Dimen.space_8))
+        Button(
+            onClick = onClickSelectAfter,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White
+            ),
+            modifier = Modifier
+                .weight(1f)
+                .heightIn(min = Dimen.button_height)
+        ) {
+            Icon(imageVector = Icons.Outlined.SaveAlt, contentDescription = null)
+        }
+    }
+    Spacer(modifier = Modifier.height(Dimen.space_16))
+}
+
 
 @Composable
 fun AdLoadingScreen() {
