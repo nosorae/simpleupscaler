@@ -181,11 +181,11 @@ fun MainScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            UpscaleTopAppBar(
-                onClickHelp = {
-                    viewModel.onClickHelp(activity.getSettingsLocale())
-                }
-            )
+//            UpscaleTopAppBar(
+//                onClickHelp = {
+//                    viewModel.onClickHelp(activity.getSettingsLocale())
+//                }
+//            )
         },
         bottomBar = {
 //            BottomAdmobBanner(modifier = Modifier.fillMaxWidth())
@@ -513,7 +513,7 @@ fun ColumnScope.AfterEnhanceScreen(
     onClickReselectImage: () -> Unit,
     onClickSave: (after: String) -> Unit
 ) {
-    Spacer(modifier = Modifier.height(Dimen.space_16))
+//    Spacer(modifier = Modifier.height(Dimen.space_16))
 
     ImageComparer(
         before = before,
