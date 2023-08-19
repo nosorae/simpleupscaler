@@ -32,9 +32,20 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("/Users/sorea.no/simpleupscaler")
+            storePassword = "simpleupscaler"
+            keyAlias = "simpleupscaler"
+            keyPassword = "simpleupscaler"
+        }
+    }
+
+
     buildTypes {
         release {
             isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
