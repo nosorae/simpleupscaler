@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Simple Upscaler</string>
+    <string name="app_name">AI Photo Enhancer</string>
 
     <!-- Main -->
     <string name="main_before">Before</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Ampliador Simples</string>
+    <string name="app_name">Melhorador de Fotos com IA</string>
 
     <!-- Main -->
     <string name="main_before">Antes</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">심플 업스케일러</string>
+    <string name="app_name">AI Photo Enhancer</string>
 
     <!-- Main -->
     <string name="main_before">전</string>

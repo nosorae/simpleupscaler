@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Einfacher Vergrößerer</string>
+    <string name="app_name">KI Foto-Verbesserer</string>
 
     <!-- Main -->
     <string name="main_before">Vorher</string>
