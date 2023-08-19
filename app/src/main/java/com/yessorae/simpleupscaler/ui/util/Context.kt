@@ -36,5 +36,9 @@ fun Context.redirectToWebBrowser(link: String, onActivityNotFoundException: () -
 fun Context.getSettingsLocale(): Locale {
     val config = android.content.res.Configuration()
     Settings.System.getConfiguration(this.contentResolver, config)
-    return config.locales.get(0)
+    return if (config.locales.size() == 0) {
+        Locale.getDefault()
+    } else {
+        config.locales.get(0)
+    }
 }
