@@ -23,8 +23,8 @@ android {
         applicationId = "com.yessorae.simpleupscaler"
         minSdk = 24
         targetSdk = 33
-        versionCode = 1_00_00_02
-        versionName = "1.0.0.2"
+        versionCode = 1_00_00_03
+        versionName = "1.0.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -44,7 +44,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
