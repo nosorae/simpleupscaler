@@ -19,7 +19,8 @@ object NetworkModule {
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient
             .Builder()
-            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
             .addInterceptor(PicWishApiInterceptor())
             .build()
     }
